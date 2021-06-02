@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col-md-8 offset-md-2">
                 <div class="order-box">
-                    <img :src="product.image" :alt="product.name">
+                    <img :src="'/images/'+product.image" :alt="product.name">
                     <h2 class="title" v-html="product.name"></h2>
                     <p class="small-text text-muted float-left">$ {{product.price}}</p>
                     <p class="small-text text-muted float-right">Available Units: {{product.units}}</p>

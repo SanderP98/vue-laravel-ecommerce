@@ -30,6 +30,7 @@ Route::group(['middleware' => 'auth:api'], function(){
     Route::get('users/{user}/orders',[UserController::class, 'showOrders']);
     Route::patch('products/{product}/units/add',[ProductController::class, 'updateUnits']);
     Route::patch('orders/{order}/deliver',[OrderController::class, 'deliverOrder']);
+    Route::delete('orders/{ids}/deleteMany', [OrderController::class, 'destroyMany']);
     Route::delete('products/{ids}/deleteMany', [ProductController::class, 'destroyMany']);
     Route::delete('products/{product}/delete', [ProductController::class, 'destroy']);
     Route::delete('orders/{order}/delete', [OrderController::class, 'destroy']);

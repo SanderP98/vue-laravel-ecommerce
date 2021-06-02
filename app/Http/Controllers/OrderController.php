@@ -117,4 +117,13 @@ class OrderController extends Controller
             'message' => $status ? 'Order deleted' : 'Order not deleted'
         ]);
     }
+    
+    public function destroyMany($ids) {
+        $status = Order::whereIn('id',explode(",",$ids))->delete();
+
+        return response()->json([
+            'status' => $status,
+            'message' => $status ? 'Orders deleted' : 'Orders not deleted'
+        ]);
+    }
 }

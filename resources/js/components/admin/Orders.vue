@@ -1,30 +1,91 @@
 <template>
     <div>
-        <table class="table table-responsive table-striped">
-            <thead>
-                <tr>
-                    <td></td>
-                    <td>Product</td>
-                    <td>Quantity</td>
-                    <td>Cost</td>
-                    <td>Delivery Address</td>
-                    <td>is Delivered?</td>
-                    <td>Actions</td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(order,index) in orders" :key="index">
-                    <td>{{index+1}}</td>
-                    <td v-html="order.product.name"></td>
-                    <td>{{order.quantity}}</td>
-                    <td>{{order.quantity * order.product.price}}</td>
-                    <td>{{order.address}}</td>
-                    <td>{{order.is_delivered == 1? "Yes" : "No"}}</td>
-                    <td><button class="btn btn-success" :disabled="order.is_delivered == 1" @click="deliver(index)">Deliver</button></td>
-                    <td><button class="btn btn-danger" @click="remove(index)">Delete</button></td>
-                </tr>
-            </tbody>
-        </table>
+        <div>
+            <Toolbar class="mb-4">
+                <template #left>
+                    <Button label="Delete" icon="pi pi-trash" class="p-button-danger" @click="confirmDeleteSelected" :disabled="!selectedOrders || !selectedOrders.length" />
+                </template>
+
+                <template #right>
+                    <Button label="Export" icon="pi pi-upload" class="p-button-help" @click="exportCSV($event)" />
+                </template>
+            </Toolbar>
+
+            
+            <DataTable ref="dt" :value="orders" :selection.sync="selectedOrders" dataKey="id"
+            :paginator="true" :rows="10" :filters="filters"
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products">
+                <template #header>
+                    <div class="table-header">
+                        <h5 class="p-m-0">Manage orders</h5>
+                        <span class="p-input-icon-left">
+                            <i class="pi pi-search"/>
+                            <InputText v-model="filters['global']" placeholder="Search..." />
+                        </span>
+                    </div>
+                </template>
+
+                <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
+                <Column field="product.name" header="Product" sortable></Column>
+                <Column field="quantity" header="Quantity" sortable></Column>
+                <Column field="cost" header="Cost" sortable>
+                    <template #body="slotProps">
+                        {{formatCurrency(slotProps.data.product.price)}}
+                    </template>
+                </Column>
+                <Column field="address" header="Delivery Address" sortable></Column>
+                <Column field="is_delivered" header="Status" sortable>
+                    <template #body="slotProps">
+                        <Tag :value="slotProps.data.is_delivered == 1 ? 'Shipped' : 'Awaiting'" 
+                        :icon="slotProps.data.is_delivered == 1 ? 'pi pi-check' : 'pi pi-spin pi-spinner'" 
+                        :severity="slotProps.data.is_delivered == 1 ? 'success' : 'info'">
+                        </Tag>
+                    </template>
+                </Column>
+                <Column>
+                    <template #body="slotProps">
+                        <Button icon="pi pi-send" class="p-button-rounded p-button-success p-mr-2" @click="confirmDeliver(slotProps.data)" :disabled="slotProps.data.is_delivered == 1"/>
+                        <Button icon="pi pi-trash" class="p-button-rounded p-button-warning" @click="confirmDeleteOrder(slotProps.data)" />
+                    </template>
+                </Column>
+            </DataTable>
+        </div>
+
+        <Dialog :visible.sync="orderDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
+            <div class="confirmation-content">
+                <i class="pi pi-exclamation-triangle p-mr-3" style="font-size: 2rem" />
+                <span v-if="order">Are you sure you want to deliver the order <b>{{order.name}}</b>?</span>
+            </div>
+            <template #footer>
+                <Button label="No" icon="pi pi-times" class="p-button-text" @click="orderDialog = false" />
+                <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deliverOrder" />
+            </template>
+        </Dialog>
+
+        <Dialog :visible.sync="deleteOrderDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
+            <div class="confirmation-content">
+                <i class="pi pi-exclamation-triangle p-mr-3" style="font-size: 2rem" />
+                <span v-if="order">Are you sure you want to delete <b>{{order.name}}</b>?</span>
+            </div>
+            <template #footer>
+                <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteOrderDialog = false" />
+                <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteOrder" />
+            </template>
+        </Dialog>
+
+        <Dialog :visible.sync="deleteOrdersDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
+            <div class="confirmation-content">
+                <i class="pi exclamation-check-triangle p-mr-3" style="font-size: 2rem" />
+                <span v-if="order">Are you sure you want to delete the selected orders?</span>
+            </div>
+            <template #footer>
+                <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteOrdersDialog = false"/>
+                <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteSelectedOrders" />
+            </template>
+        </Dialog>
+
+        <Toast />
     </div>
 </template>
 
@@ -32,29 +93,83 @@
     export default {
         data () {
             return {
-                orders : []
+                orders : [],
+                orderDialog: false,
+                deleteOrderDialog: false,
+                deleteOrdersDialog: false,
+                order: {},
+                selectedOrders : null,
+                filters: {},
+                submitted: false,
             }
         },
         beforeMount() {
             axios.get('/api/orders/').then(response => this.orders = response.data)
         },
         methods : {
-            deliver(index) {
-                let order = this.orders[index]
-                axios.patch(`/api/orders/${order.id}/deliver`).then(response => {
-                    this.orders[index].is_delivered = 1
-                    this.$forceUpdate()
-                });
+            formatCurrency(value) {
+                return value.toLocaleString('nl-NL', {style: 'currency', currency: 'EUR'});
             },
-            remove(index) {
-                if(confirm("Do you really want to delete?")) {
-                    let order = this.orders[index]
-                    axios.delete(`/api/orders/${order.id}/delete`).then(response => {
-                        this.$forceUpdate()
-                        alert(response.data.message);
+            confirmDeliver(order) {
+                this.order = {...order};
+                this.orderDialog = true;
+            },
+            deliverOrder() {
+                if (this.order.id) {
+                this.$set(this.orders, this.findIndexById(this.order.id), this.order)
+                    axios.patch(`/api/orders/${this.order.id}/deliver`, { is_delivered: '1'}).then(response => {
+                        axios.get('/api/orders/').then(response => this.orders = response.data)
                     });
                 }
-            }
+                this.orderDialog = false;
+                this.order = {};
+            },
+            confirmDeleteOrder(order) {
+                this.order = order;
+                this.deleteOrderDialog = true;
+            },
+            deleteOrder() {
+                axios.delete(`/api/orders/${this.order.id}/delete`).then(response => {
+                    if(response.data.status) {
+                        this.orders = this.orders.filter(val => val.id !== this.order.id);
+                        this.deleteOrderDialog = false;
+                        this.$toast.add({severity:'success', summary: 'Success Message', detail: response.data.message, life: 3000});
+                        this.order = {};
+                    }
+                });
+            },
+            confirmDeleteSelected() {
+                this.deleteOrdersDialog = true;
+            },
+            deleteSelectedOrders() {
+                this.selectedOrdersIds = this.orders.map(({id}) => id);
+                this.orders = this.orders.filter(val => !this.selectedOrders.includes(val));
+
+                axios.delete(`/api/orders/${this.selectedOrdersIds}/deleteMany`).then(response => {
+                    this.$toast.add({severity:'success', summary: 'Success Message', detail: response.data.message, life: 3000});
+                });
+
+                this.deleteOrdersDialog = false;
+                this.selectedOrders = null;
+            },
+            findIndexById(id) {
+                let index = -1;
+                for (let i = 0; i < this.orders.length; i++) {
+                    if (this.orders[i].id === id) {
+                        index = i;
+                        break;
+                    }
+                }
+                return index;
+            },
         }
     }
 </script>
+
+<style scoped>
+.table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+</style>

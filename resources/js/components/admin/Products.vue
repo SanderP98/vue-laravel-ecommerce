@@ -118,7 +118,6 @@
 </template>
 
 <script>
-let item1
     export default {
         data () {
             return {
@@ -167,9 +166,9 @@ let item1
                     let headers = {'Content-Type': 'multipart/form-data'}
                     axios.post("/api/upload-file", formData, {headers}).then(response => {
                         this.product.image = response.data
-                        this.saveProduct();
                     });
-                }
+                } 
+                this.saveProduct();
             },
             saveProduct() {
                 this.submitted = true;

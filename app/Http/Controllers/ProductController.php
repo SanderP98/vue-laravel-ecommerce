@@ -127,7 +127,12 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroyMany($ids) {
-        Product::whereIn('id',explode(",",$ids))->delete();
+        $status = Product::whereIn('id',explode(",",$ids))->delete();
+
+        return response()->json([
+            'status' => $status,
+            'message' => $status ? 'Products deleted' : 'Products not deleted'
+        ]);
     }
 
     public function destroy(Product $product)

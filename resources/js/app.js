@@ -27,6 +27,7 @@ import InputNumber from 'primevue/inputnumber'
 import Dialog from 'primevue/dialog'
 import TextArea from 'primevue/textarea'
 import FileUpload from 'primevue/fileupload'
+import Tag from 'primevue/tag'
 
 //Stylesheets
 import 'primevue/resources/themes/bootstrap4-light-blue/theme.css'
@@ -54,6 +55,7 @@ Vue.use(InputNumber)
 Vue.use(Dialog)
 Vue.use(TextArea)
 Vue.use(FileUpload)
+Vue.use(Tag)
 
 Vue.component('Toast', Toast)
 Vue.component('MultiSelect', MultiSelect)
@@ -70,6 +72,7 @@ Vue.component('InputNumber', InputNumber)
 Vue.component('Dialog', Dialog)
 Vue.component('TextArea', TextArea)
 Vue.component('FileUpload', FileUpload)
+Vue.component('Tag', Tag)
 
 //Views
 import App from './views/App'
