@@ -67,6 +67,10 @@
                 <small class="p-invalid" v-if="submitted && !product.name">Name is required</small>
             </div>
             <div class="p-field">
+                <label for="category">Category</label>
+                <TextArea id="category" v-model="product.category" required="true" rows="3" cols="20" />
+            </div>
+            <div class="p-field">
                 <label for="description">Description</label>
                 <TextArea id="description" v-model="product.description" required="true" rows="3" cols="20" />
             </div>
@@ -191,6 +195,7 @@
                             this.$toast.add({severity:'success', summary: 'Successful', detail: 'Product Updated', life: 3000});
                         });
                     } else {
+                        let category = this.product.category
                         let name = this.product.name
                         let units = this.product.units
                         let price = this.product.price
@@ -205,7 +210,7 @@
                                 let image = this.product.image
                                 this.$emit('close', this.product)
 
-                                axios.post("/api/products/", {name, units, price, description, image})
+                                axios.post("/api/products/", {category, name, units, price, description, image})
                                 .then(response => {
                                     this.products.push(response.data.data);
                                 });
@@ -262,7 +267,6 @@
                 this.selectedProducts = this.products.filter(val => this.selectedProducts.includes(val));
                 this.products = this.products.filter(val => !this.selectedProducts.includes(val));
                 this.selectedProductsIds = this.selectedProducts.map(({id}) => id);
-                
                 axios.delete(`/api/products/${this.selectedProductsIds}/deleteMany`).then(response => {
                     this.$toast.add({severity:'success', summary: 'Success Message', detail: response.data.message, life: 3000});
                 });

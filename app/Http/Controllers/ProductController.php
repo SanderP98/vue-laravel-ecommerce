@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Order;
 use App\Models\ProductRating;
+use App\Models\OrderDetails;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -41,6 +42,7 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $product = Product::create([
+            'category_id' => $request->category,
             'name' => $request->name,
             'description' => $request->description,
             'units' => $request->units,
@@ -131,11 +133,39 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroyMany($ids) {
-        $status = Product::whereIn('id',explode(",",$ids))->delete();
+        $status = false;
+        $ids = explode(",", $ids);
+        foreach ($ids as $id) {
+            $innerJoin = OrderDetails::where('product_id', $id)->pluck('order_id');
+            if ($innerJoin->count()) {
+                $innerJoin = preg_replace("/[^A-Za-z0-9\-]/", '', $innerJoin);
+                $waitingToBeShipped = Order::where('is_delivered', 0)
+                ->join('order_details', 'orders.id', '=', 'order_details.order_id')
+                ->where('order_details.order_id', $innerJoin)
+                ->get();
+            } 
 
+            if($waitingToBeShipped->count()) {
+                $status .= '#'.$id . ', ';
+            } else {
+                $product = Product::find($id)->delete();
+                $order_details = OrderDetails::where('product_id', $id)->delete();
+                $order = Order::join('order_details', 'orders.id', '=', 'order_details.order_id')
+                ->where('order_details.order_id', $innerJoin)->delete();
+            }
+            $waitingToBeShipped = '';
+            $innerJoin = '';
+        }
+
+
+        if ( strlen($status) ) {
+            $status = rtrim($status, ', ');
+            $status = 'All products but: '.$status.' have been deleted, make sure to deliver the pending orders first.';
+        }
+        Log::info($status);
         return response()->json([
             'status' => $status,
-            'message' => $status ? 'Products deleted' : 'Products not deleted'
+            'message' => !$status ? 'Products deleted' : $status ? : 'Products could not be deleted.'
         ]);
     }
 
