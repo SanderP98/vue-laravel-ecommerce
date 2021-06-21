@@ -17,13 +17,18 @@ use App\Http\Controllers\UserController;
 |
 */
 
+
 Route::post('login', [UserController::class, 'login']);
 Route::post('register', [UserController::class, 'register']);
 Route::get('/products', [ProductController::class, 'index']);
 Route::post('/upload-file', [ProductController::class, 'uploadFile']);
 Route::get('/products/{product}', [ProductController::class, 'show']);
+Route::get('payment-success',[OrderController::class, 'paymentSuccess'])->name('payment.success');
+Route::post('webhooks/mollie',[OrderController::class, 'webhook'])->name('webhooks.mollie');
+Route::resource('/orders', OrderController::class);
 
 Route::group(['middleware' => 'auth:api'], function(){
+    Route::post('molliepayment', [OrderController::class, 'preparePayment'])->name('mollie.payment');
     Route::get('/users',[UserController::class, 'index']);
     Route::get('users/{user}',[UserController::class, 'show']);
     Route::patch('users/{user}',[UserController::class, 'update']);
@@ -34,6 +39,6 @@ Route::group(['middleware' => 'auth:api'], function(){
     Route::delete('products/{ids}/deleteMany', [ProductController::class, 'destroyMany']);
     Route::delete('products/{product}/delete', [ProductController::class, 'destroy']);
     Route::delete('orders/{order}/delete', [OrderController::class, 'destroy']);
-    Route::resource('/orders', OrderController::class);
+
     Route::resource('/products', ProductController::class)->except(['index','show']);
 });

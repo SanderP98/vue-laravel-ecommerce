@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Auth;
 use App\Models\User;
 use Validator;
-
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -24,7 +24,7 @@ class UserController extends Controller
             $status = 200;
             $response = [
                 'user' => Auth::user(),
-                'token' => Auth::user()->createToken('bigStore')->accessToken,
+                'token' => Auth::user()->createToken('vue-laravel-ecommerce')->accessToken,
             ];
         }
 
@@ -52,7 +52,7 @@ class UserController extends Controller
 
         return response()->json([
             'user' => $user,
-            'token' => $user->createToken('bigStore')->accessToken,
+            'token' => $user->createToken('vue-laravel-ecommerce')->accessToken,
         ]);
     }
 
@@ -63,7 +63,8 @@ class UserController extends Controller
 
     public function showOrders(User $user)
     {
-        return response()->json($user->orders()->with(['product'])->get());
+        Log::info($user->orders()->with('product', 'order_details', 'address')->get());
+        return response()->json($user->orders()->with('order_details', 'order_details.product', 'address')->get());
     }
 
 }

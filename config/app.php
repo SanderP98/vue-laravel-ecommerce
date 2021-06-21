@@ -53,6 +53,7 @@ return [
     */
 
     'url' => env('APP_URL', 'http://localhost'),
+    'mix_url' => env('MIX_BASE_URL', null),
 
     'asset_url' => env('ASSET_URL', null),
 
@@ -165,7 +166,7 @@ return [
         /*
          * Package Service Providers...
          */
-
+        Mollie\Laravel\MollieServiceProvider::class,
         /*
          * Application Service Providers...
          */
@@ -227,7 +228,7 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-
+        'Mollie' => Mollie\Laravel\Facades\Mollie::class,
     ],
 
 ];

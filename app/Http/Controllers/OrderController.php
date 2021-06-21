@@ -3,11 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\OrderDetails;
+use App\Models\Address;
+use App\Models\Product;
 use Auth;
+use Session;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderCreatedMail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Mollie\Laravel\Facades\Mollie;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
+    public function  __construct() {
+        Mollie::api()->setApiKey('test_jEVj5aVaURvn3Us4Pw5fugxxhxaqEn'); // your mollie test api key
+    }
     /**
      * Display a listing of the resource.
      *
@@ -15,7 +27,7 @@ class OrderController extends Controller
      */
     public function index()
     {
-        return response()->json(Order::with(['product'])->get(), 200);
+        return response()->json(Order::with('order_details', 'order_details.product', 'address', 'user')->get(), 200);
     }
 
     public function deliverOrder(Order $order) {
@@ -27,6 +39,130 @@ class OrderController extends Controller
             'data' => $order,
             'message' => $order ? 'Order delivered' : 'Order not delivered'
         ]);
+    }
+    public function preparePayment(Request $request)
+    {   
+        $products = $request->get('products');
+        $totalPrice = number_format($request->get('totalPrice'), 2, '.', '');
+        $payment = Mollie::api()->payments()->create([
+            'amount' => [
+                'currency' => 'EUR', // Type of currency you want to send
+                'value' => $totalPrice, // You must send the correct number of decimals, thus we enforce the use of strings
+            ],
+            'description' => "Beschrijving", 
+            'webhookUrl' => route('webhooks.mollie'),
+            'redirectUrl' => route('payment.success'),
+            "metadata" => [
+                "products" => $products,
+                "user_id" => Auth::id(),
+                "user" => Auth::user(),
+                "totalPrice" => $totalPrice,
+            ], 
+        ]);
+    
+        $payment = Mollie::api()->payments()->get($payment->id);
+    
+        // redirect customer to Mollie checkout page
+        return response()->json([
+            'data' => $payment,
+        ]);
+    }
+    public function paymentSuccess(Request $request) {
+        //Hier de bestelling afronden en de status op betaald zetten.
+        //$payment = Mollie::api()->payments->get($request->id);
+
+        return redirect()->to('/dashboard/orders?success=1');
+    }
+    
+    public function webhook(Request $request) {
+        if (! $request->has('id')) {
+            return;
+        }
+        $payment = Mollie::api()->payments()->get($request->id);
+        
+        //Log::info('Test '.$payment->metadata->order_id);
+
+        $statusOfPayment='';
+
+        if ($payment->isPaid() && !$payment->hasRefunds() && !$payment->hasChargebacks()) {
+            /*
+             * The payment is paid and isn't refunded or charged back.
+             * At this point you'd probably want to start the process of delivering the product to the customer.
+             */
+               $statusOfPayment='paid';
+     
+        } elseif ($payment->isOpen()) {
+            /*
+             * The payment is open.
+             */
+             $statusOfPayment='open';
+        } elseif ($payment->isPending()) {
+            /*
+             * The payment is pending.
+             */
+             $statusOfPayment='pending';
+     
+        } elseif ($payment->isFailed()) {
+            /*
+             * The payment has failed.
+             */
+            $statusOfPayment='failed';
+     
+        } elseif ($payment->isExpired()) {
+            /*
+             * The payment is expired.
+             */
+        } elseif ($payment->isCanceled()) {
+            /*
+             * The payment has been canceled.
+             */
+     
+              $statusOfPayment='expired';
+     
+        } elseif ($payment->hasRefunds()) {
+            /*
+             * The payment has been (partially) refunded.
+             * The status of the payment is still "paid"
+             */
+     
+                $statusOfPayment='partially refunded';
+        } elseif ($payment->hasChargebacks()) {
+            /*
+             * The payment has been (partially) charged back.
+             * The status of the payment is still "paid"
+             */
+              $statusOfPayment='partially charged back';
+        }
+
+        $order = Order::create([
+            'user_id' => $payment->metadata->user_id,
+            'address_id' => 1, 
+            'order_status' => $statusOfPayment,
+            'total_price' => $payment->metadata->totalPrice,
+            'is_delivered' => 0,     
+        ]);
+        // Log::info($payment->metadata->products);
+        // $order_details = $order->order_details()->create([
+        //     'quantity' => '1',
+        //     'totalPrice' => '8000',
+        // ]);
+        foreach($payment->metadata->products as $product) {
+            // Log::info($product->id);
+            
+            $order_details = $order->order_details()->create([
+                'product_id' => $product->id,
+                'quantity' => $product->quantity,
+                'total_price' => $product->price * $product->quantity,
+            ]);
+
+            $productUnits = Product::find($product->id);
+
+            $productUnits->decrement('units', $product->quantity);
+
+            $productUnits->save();
+            
+        }
+        Mail::to($payment->metadata->user->email)->send(new OrderCreatedMail($order));
     }
 
     /**
@@ -69,7 +205,7 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
-        return response()->json($order, 200);
+        return response()->json(Order::with('order_details', 'order_details.product', 'address')->where('id', $order->id)->get(), 200);
     }
 
     /**

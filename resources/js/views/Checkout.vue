@@ -2,14 +2,15 @@
     <div class="container">
         <div class="row">
             <div class="col-md-8 offset-md-2">
-                <div class="order-box">
-                    <img :src="'/images/'+product.image" :alt="product.name">
+                <div class="order-box" v-for="(product, index) in products" :key="index">
+                    <img :src="'/images/'+product.image" :alt="product.name" height="50px" width="50px">
                     <h2 class="title" v-html="product.name"></h2>
-                    <p class="small-text text-muted float-left">$ {{product.price}}</p>
+                    <p class="small-text text-muted float-left">{{formatCurrency(product.price * product.quantity)}}</p>
                     <p class="small-text text-muted float-right">Available Units: {{product.units}}</p>
                     <br>
                     <hr>
-                    <label class="row"><span class="col-md-2 float-left">Quantity: </span><input type="number" name="units" min="1" :max="product.units" class="col-md-2 float-left" v-model="quantity" @change="checkUnits"></label>
+                    <label class="row"><span class="col-md-2 float-left">Quantity: </span><input type="number" name="quantity" min="1" :max="product.units" v-model="product.quantity" class="col-md-2 float-left" @input="checkUnits(product)"></label>
+                    <!-- <InputNumber v-model="product.quantity" :min="1" :max="product.units" /> -->
                 </div>
                 <br>
                 <div>
@@ -19,13 +20,13 @@
                         <button class="col-md-4 btn btn-danger float-right" @click="register">Create an account</button>
                     </div>
                     <div v-if="isLoggedIn">
-                        <div class="row">
+                        <!-- <div class="row">
                             <label for="address" class="col-md-3 col-form-label">Delivery Address</label>
                             <div class="col-md-9">
                                 <input id="address" type="text" class="form-control" v-model="address" required>
                             </div>
                         </div>
-                        <br>
+                        <br> -->
                         <button class="col-md-4 btn btn-sm btn-success float-right" v-if="isLoggedIn" @click="placeOrder">Continue</button>
                     </div>
                 </div>
@@ -40,24 +41,44 @@
         data () {
             return {
                 address : "",
-                quantity : 1,
                 isLoggedIn : null,
-                product : []
+                products : [],
+                product: {},
+                totalPrice: 0,
             }
         },
         mounted() {
             this.isLoggedIn = localStorage.getItem('vue-laravel-ecommerce.jwt') != null
         },
         beforeMount() {
-            axios.get(`/api/products/${this.pid}`).then(response => this.product = response.data)
+            if ( this.$route.query.pid ) {
+                axios.get(`/api/products/${this.pid}`).then(response => {
+                    this.product.id = response.data.id
+                    this.product.name = response.data.name
+                    this.product.units = response.data.units
+                    this.product.image = response.data.image
+                    this.product.price = response.data.price
+                    this.product.quantity = 1
+                    this.products.push(this.product);
+                    this.product = []
 
+                });
+            } else {
+                this.products = JSON.parse(localStorage.getItem('vue-laravel-ecommerce.shopCart')); 
+            }
             if ( localStorage.getItem('vue-laravel-ecommerce.jwt' ) != null ) {
                 this.user = JSON.parse(localStorage.getItem('vue-laravel-ecommerce.user'))
                 axios.defaults.headers.common['Content-Type'] = 'application/json'
                 axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('vue-laravel-ecommerce.jwt')
+                console.log(this.products);
             }
         },
         methods : {
+            formatCurrency(value) {
+                if(value) {
+                    return value.toLocaleString('nl-NL', {style: 'currency', currency: 'EUR'});
+                }
+            },
             login() {
                 this.$router.push({ name: 'login', params: {nextUrl: this.$route.fullPath }}).catch(() => {});
             },
@@ -67,18 +88,21 @@
             placeOrder(e) {
                 e.preventDefault();
 
-                let address = this.address
-                let product_id = this.product.id
-                let quantity = this.quantity
+                let products = this.products
+                let totalPrice = this.products.reduce((total, item)=> {
+                    return total + item.quantity * item.price;
+                }, 0);
 
-                axios.post('api/orders/', { address, quantity, product_id })
-                     .then(response => this.$router.push('/confirmation')).catch(() => {});
+                axios.post('api/molliepayment', { products, totalPrice }).then(response => {
+                    window.location.href = response.data.data._links.checkout.href;
+                }).catch(() => {});
             },
-            checkUnits(e) {
-                if ( this.quantity > this.product.units ) {
-                    this.quantity = this.product.units
+            checkUnits(product) {
+                if ( product.quantity > product.units ) {
+                    product.quantity = product.units
                 }
-            }
+                this.$forceUpdate();
+            },
         }
     }
 </script>

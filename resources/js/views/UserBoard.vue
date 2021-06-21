@@ -1,26 +1,15 @@
 <template>
     <div>
-        <div class="container-fluid hero-section d-flex align-content-center justify-content-center flex-wrap ml-auto">
-            <h2 class="title">All your orders</h2>
-        </div>
-        <div class="container">
+        <div class="container-fluid">
             <div class="row">
-                <div class="col-md-12">
-                    <br>
-                    <div class="row">
-                        <div class="col-md-4 product-box" v-for="(order,index) in orders" :key="index">
-                            <img :src="order.product.image" :alt="order.product.name">
-                            <h5><span v-html="order.product.name"></span><br>
-                                <span class="small-text text-muted">$ {{order.product.price}}</span>
-                            </h5>
-                            <hr>
-                            <span class="small-text text-muted">Quantity: {{order.quantity}}
-                                <span class="float-right">{{order.is_delivered == 1? "shipped!" : "not shipped"}}</span>
-                            </span>
-                            <br><br>
-                            <p><strong>Delivery address:</strong> <br>{{order.address}}</p>
-                        </div>
-                    </div>
+                <div class="col-lg-2">
+                    <ul style="list-style-type:none" class="mx-auto d-table">
+                        <li class="active"><button class="btn" @click="setComponent('main')">Dashboard</button></li>
+                        <li><button class="btn" @click="setComponent('orders')">Orders</button></li>
+                    </ul>
+                </div>
+                <div class="col-lg-10" v-bind:class="[this.$route.params.id ? 'order-page' : '']">
+                    <component :is="activeComponent"></component>
                 </div>
             </div>
         </div>
@@ -28,21 +17,64 @@
 </template>
 
 <script>
+    import Main from '../components/user/Main'
+    import Orders from '../components/user/Orders'
+    import Order from '../components/user/Order'
     export default {
         data() {
             return {
                 user : null,
-                orders : []
+                orders : [],
+                selectedOrder: null,
+                activeComponent : null,
             }
         },
+        components : {
+            Main, Orders, Order
+        },
         beforeMount() {
+            if (this.$route.query.success) {
+                if(this.$parent.$emit('emptyCart')) {
+                    //
+                }
+            }
+            this.$on('setComponent', this.setComponent)
+            if(this.$route.params.id) {
+                this.activeComponent = Order;
+                this.$router.push({ name: 'order-page', params: {page: 'orders', id: this.$route.params.id }}).catch(() => {});
+            } 
+            else if (this.$route.params.page) 
+            {
+                this.activeComponent = Main;   
+                this.setComponent(this.$route.params.page)
+            }
             this.user = JSON.parse(localStorage.getItem('vue-laravel-ecommerce.user'))
-
             axios.defaults.headers.common['Content-Type'] = 'application/json'
-            axios.defaults.headers.common['Authorization'] = 'Bearer  ' + localStorage.getItem('vue-laravel-ecommerce.jwt')
-        
-            axios.get(`api/users/${this.user.id}/orders`)
-                 .then(response => this.orders = response.data)
+            axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('vue-laravel-ecommerce.jwt')
+        },
+        methods : {
+            setComponent(value, id) {
+                //if a single order is selected
+                this.selectedOrder = id;
+                switch(value) {
+                    case "main":
+                        this.activeComponent = Main;
+                        this.$router.push({ name: 'user-pages', params: {page: 'main' }}).catch(() => {});
+                        break;
+                    case "orders":
+                        this.activeComponent = Orders;
+                        this.$router.push({ name: 'user-pages', params: {page: 'orders' }}).catch(() => {});
+                        break;                    
+                    case "order":
+                        this.activeComponent = Order;
+                        this.$router.push({ name: 'order-page', params: {page: 'orders', id: this.selectedOrder }}).catch(() => {});
+                        break;
+                    default:
+                        this.activeComponent = Main;
+                        this.$router.push({ name: 'userboard'}).catch(() => {});
+                        break;
+                }
+            },
         }
     }
 </script>
@@ -63,5 +95,19 @@
 .title { 
     font-size: 60px; 
     color: #ffffff; 
+}
+.order-page {
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    max-width: 100%;   
+    pointer-events:all;
+    z-index:-1; 
+}
+@media screen and (max-width: 64em) {
+    .order-page {
+        margin-top:100px;
+    }
 }
 </style>

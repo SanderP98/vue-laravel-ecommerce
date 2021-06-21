@@ -2,7 +2,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-8 offset-md-2">
-                <img :src="'/images/'+product.image" :alt="product.name">
+                <img :src="'/images/'+product.image" :alt="product.name" height="50px" width="50px">
                 <h3 class="title" v-html="product.name"></h3>
                 <p class="text-muted">{{product.description}}</p>
                 <h4>
@@ -11,7 +11,10 @@
                 </h4>
                 <br>
                 <hr>
-                <router-link :to="{ path: '/checkout?pid='+product.id }" class="col-md-4 btn btn-sm btn-primary float-right">Buy Now</router-link>
+                <div class="text-right">
+                <router-link :to="{ path: '/checkout?pid='+product.id }" class="col-md-4 p-button">Buy Now</router-link>
+                <Button icon="pi pi-shopping-cart" :disabled="product.units === '0'" @click="addToCart(product)"></Button>
+                </div>
             </div>
         </div>
     </div>
@@ -27,6 +30,12 @@
         beforeMount() {
             let url = `/api/products/${this.$route.params.id}`
             axios.get(url).then(response => this.product = response.data)
+        },
+        methods : {
+            addToCart(product) {
+                product.quantity = 1;
+                this.$parent.$emit('addToCart', product);
+            }
         }
     }
 </script>

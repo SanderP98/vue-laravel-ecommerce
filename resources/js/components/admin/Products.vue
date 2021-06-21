@@ -165,12 +165,15 @@
                     formData.append("image", this.attachment)
                     let headers = {'Content-Type': 'multipart/form-data'}
                     axios.post("/api/upload-file", formData, {headers}).then(response => {
-                        this.product.image = response.data
+                        let newImage = response.data 
+                        this.saveProduct(newImage);
+                        // alert(response.data);
                     });
-                } 
-                this.saveProduct();
+                } else {
+                    this.saveProduct();
+                }
             },
-            saveProduct() {
+            saveProduct(newImage) {
                 this.submitted = true;
                 if (this.product.name.trim()) {
                     if (this.product.id) {
@@ -180,7 +183,7 @@
                         let units = this.product.units
                         let price = this.product.price
                         let description = this.product.description
-                        let image = this.product.image
+                        let image = newImage ? newImage : this.product.image
                         
                         axios.put(`/api/products/${this.product.id}`, {name, units, price, description, image})
                         .then(response => {
@@ -255,9 +258,11 @@
                 this.deleteProductsDialog = true;
             },
             deleteSelectedProducts() {
-                this.selectedProductsIds = this.products.map(({id}) => id);
-                this.products = this.products.filter(val => !this.selectedProducts.includes(val));
 
+                this.selectedProducts = this.products.filter(val => this.selectedProducts.includes(val));
+                this.products = this.products.filter(val => !this.selectedProducts.includes(val));
+                this.selectedProductsIds = this.selectedProducts.map(({id}) => id);
+                
                 axios.delete(`/api/products/${this.selectedProductsIds}/deleteMany`).then(response => {
                     this.$toast.add({severity:'success', summary: 'Success Message', detail: response.data.message, life: 3000});
                 });

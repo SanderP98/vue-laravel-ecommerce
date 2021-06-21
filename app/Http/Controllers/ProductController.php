@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
@@ -61,6 +62,7 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         return response()->json($product, 200);
+        Log::info($product);
     }
 
     public function uploadFile(Request $request) {
@@ -103,7 +105,7 @@ class ProductController extends Controller
         $status = $product->update(
             $request->only([ 'name', 'description', 'units', 'price', 'image' ])
         );
-
+        Log::info($request->get('image'));
         return response()->json([
             'status' => $status,
             'message' => $status ? 'Product updated!' : 'Product not updated!'

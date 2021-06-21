@@ -6,8 +6,14 @@
 //Imports
 require('./bootstrap');
 
-import Vue from 'vue'
+//Stylesheets
+import 'primevue/resources/themes/saga-blue/theme.css'
+import 'primevue/resources/primevue.min.css'
+import 'primeicons/primeicons.css'
+import 'primeflex/primeflex.css'
 
+//PrimeVue
+import Vue from 'vue'
 import PrimeVue from 'primevue/config'
 import ConfirmationService from 'primevue/confirmationservice';
 import Toast from 'primevue/toast'
@@ -28,11 +34,16 @@ import Dialog from 'primevue/dialog'
 import TextArea from 'primevue/textarea'
 import FileUpload from 'primevue/fileupload'
 import Tag from 'primevue/tag'
-
-//Stylesheets
-import 'primevue/resources/themes/bootstrap4-light-blue/theme.css'
-import 'primevue/resources/primevue.min.css'
-import 'primeicons/primeicons.css'
+import DataView from 'primevue/dataview'
+import Dropdown from 'primevue/dropdown'
+import DataViewLayoutOptions  from 'primevue/dataviewlayoutoptions'
+import Rating from 'primevue/rating'
+import Carousel from 'primevue/carousel'
+import OverlayPanel from 'primevue/overlaypanel'
+import Card from 'primevue/card'
+import Divider from 'primevue/divider'
+import Avatar from 'primevue/avatar'
+import AvatarGroup from 'primevue/avatargroup'
 
 //Services
 Vue.use(PrimeVue)
@@ -56,6 +67,16 @@ Vue.use(Dialog)
 Vue.use(TextArea)
 Vue.use(FileUpload)
 Vue.use(Tag)
+Vue.use(DataView)
+Vue.use(Dropdown)
+Vue.use(DataViewLayoutOptions)
+Vue.use(Rating)
+Vue.use(Carousel)
+Vue.use(OverlayPanel)
+Vue.use(Card)
+Vue.use(Divider)
+Vue.use(Avatar)
+Vue.use(AvatarGroup)
 
 Vue.component('Toast', Toast)
 Vue.component('MultiSelect', MultiSelect)
@@ -73,6 +94,17 @@ Vue.component('Dialog', Dialog)
 Vue.component('TextArea', TextArea)
 Vue.component('FileUpload', FileUpload)
 Vue.component('Tag', Tag)
+Vue.component('DataView', DataView)
+Vue.component('Dropdown', Dropdown)
+Vue.component('DataViewLayoutOptions', DataViewLayoutOptions)
+Vue.component('Rating', Rating)
+Vue.component('Carousel', Carousel)
+Vue.component('OverlayPanel', OverlayPanel)
+Vue.component('Card', Card)
+Vue.component('Divider', Divider)
+Vue.component('Avatar', Avatar)
+Vue.component('AvatarGroup', AvatarGroup)
+
 
 //Views
 import App from './views/App'
@@ -118,6 +150,22 @@ const router = new VueRouter({
             name: 'checkout',
             component: Checkout,
             props: (route) => ({ pid: route.query.pid })
+        },
+        {
+            path: '/dashboard/:page',
+            name: 'user-pages',
+            component: UserBoard,
+            children: [
+                {
+                  path: '/dashboard/:page/:id',
+                  name: 'order-page',
+                  component: UserBoard,
+                },
+            ],
+            meta: {
+                requiresAuth: true,
+                is_user: true
+            }
         },
         {
             path: '/dashboard',

@@ -11,7 +11,6 @@
                 </template>
             </Toolbar>
 
-            
             <DataTable ref="dt" :value="orders" :selection.sync="selectedOrders" dataKey="id"
             :paginator="true" :rows="10" :filters="filters"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
@@ -27,15 +26,44 @@
                 </template>
 
                 <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
-                <Column field="product.name" header="Product" sortable></Column>
-                <Column field="quantity" header="Quantity" sortable></Column>
-                <Column field="cost" header="Cost" sortable>
+                <Column field="user.name" header="User" sortable></Column>
+                <!-- <Column header="Product(s)" sortable>
                     <template #body="slotProps">
-                        {{formatCurrency(slotProps.data.product.price)}}
+                        <DataTable :value="slotProps.data.order_details">
+                            <Column field="product.name" headerStyle="display:none"></Column>
+                        </DataTable>
+                    </template>            
+                </Column> -->
+                <!-- <Column field="quantity" header="Quantity" sortable> -->
+                <!-- <Column field="cost" header="Cost" sortable>
+                    <template #body="slotProps">
+                        {{formatCurrency(slotProps.data.order_details)}}
+                    </template>
+                </Column> -->
+                <!-- {{orders.order_details}} -->
+                    <!-- <template #body="slotProps">
+                        <DataTable :value="slotProps.data.order_details">
+                            <Column field="quantity" headerStyle="display:none"></Column>
+                        </DataTable>
+                    </template>     
+                </Column> -->
+                <Column field="address" header="Delivery Address" sortable>
+                    <template #body="slotProps">
+                        {{slotProps.data.address.country + ", " + slotProps.data.address.address + ", " + slotProps.data.address.address_2 + ", " + slotProps.data.address.city + ", " + slotProps.data.address.zip_code}}
+                    </template>                
+                </Column>
+                <Column field="order_status" header="Status" sortable>
+                    <template #body="slotProps">
+                        <Tag v-if="slotProps.data.order_status == 'paid'" :value="slotProps.data.order_status" icon="pi pi-check" severity="success"></Tag>
+                        <Tag v-else-if="slotProps.data.order_status == 'open'" :value="slotProps.data.order_status" icon="pi pi-info-circle" severity="info"></Tag>
+                        <Tag v-else-if="slotProps.data.order_status == 'pending'" :value="slotProps.data.order_status" icon="pi pi-spin pi-spinner" severity="info"></Tag>
+                        <Tag v-else-if="slotProps.data.order_status == 'failed'" :value="slotProps.data.order_status" icon="pi pi-times" severity="danger"></Tag>
+                        <Tag v-else-if="slotProps.data.order_status == 'expired'" :value="slotProps.data.order_status" icon="pi pi-exclamation-triangle" severity="warning"></Tag>
+                        <Tag v-else-if="slotProps.data.order_status == 'partially refunded'" :value="slotProps.data.order_status" icon="pi pi-info-circle" severity="info"></Tag>
+                        <Tag v-else-if="slotProps.data.order_status == 'partially charged back'" :value="slotProps.data.order_status" icon="pi pi-info-circle" severity="info"></Tag>
                     </template>
                 </Column>
-                <Column field="address" header="Delivery Address" sortable></Column>
-                <Column field="is_delivered" header="Status" sortable>
+                <Column field="is_delivered" header="Delivery" sortable>
                     <template #body="slotProps">
                         <Tag :value="slotProps.data.is_delivered == 1 ? 'Shipped' : 'Awaiting'" 
                         :icon="slotProps.data.is_delivered == 1 ? 'pi pi-check' : 'pi pi-spin pi-spinner'" 
@@ -142,8 +170,10 @@
                 this.deleteOrdersDialog = true;
             },
             deleteSelectedOrders() {
-                this.selectedOrdersIds = this.orders.map(({id}) => id);
+                this.selectedOrders = this.orders.filter(val => this.selectedOrders.includes(val));
                 this.orders = this.orders.filter(val => !this.selectedOrders.includes(val));
+                this.selectedOrdersIds = this.orders.map(({id}) => id);
+
 
                 axios.delete(`/api/orders/${this.selectedOrdersIds}/deleteMany`).then(response => {
                     this.$toast.add({severity:'success', summary: 'Success Message', detail: response.data.message, life: 3000});
