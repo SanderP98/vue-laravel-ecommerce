@@ -1,5 +1,8 @@
 <template>
     <div class="layout-content">
+        <div v-for="(ratings, index) in products.product_ratings" :key="index">
+            {{ratings}}
+        </div>
         <DataView :value="products" :layout="layout" :paginator="true" :rows="9" :sortOrder="sortOrder" :sortField="sortField">
             <template #header>
                 <div class="p-grid p-nogutter">
@@ -18,11 +21,11 @@
                         <div class="product-list-detail">
                             <div class="product-name">{{slotProps.data.name}}</div>
                             <div class="product-description">{{slotProps.data.description}}</div>
-                            <Rating :value="3" :readonly="true" :cancel="false"></Rating>
+                            <Rating :value="slotProps.data.averageRating" :readonly="true" :cancel="false"></Rating>
                             <i class="pi pi-tag product-category-icon"></i><span class="product-category">{{slotProps.data.category}}</span>
                         </div>
                         <div class="product-list-action">
-                            <span class="product-price">${{slotProps.data.price}}</span>
+                            <span class="product-price">{{formatCurrency(slotProps.data.price)}}</span>
                             <Button icon="pi pi-shopping-cart" label="Add to Cart" :disabled="slotProps.data.units === '0'"></Button>
                             <span :class="'product-badge status-'+slotProps.data.units">{{slotProps.data.units}}</span>
                         </div>
@@ -37,7 +40,7 @@
                             <img :src="'/images/' + slotProps.data.image" :alt="slotProps.data.name"/>
                             <div class="product-name">{{slotProps.data.name}}</div>
                             <div class="product-description">{{slotProps.data.description}}</div>
-                            <!--<Rating :value="slotProps.data.rating" :readonly="true" :cancel="false"></Rating>-->
+                            <Rating :value="slotProps.data.averageRating" :readonly="true" :cancel="false"></Rating>
                         </div>
                         <div class="product-grid-item-bottom">
                             <span class="product-price">{{formatCurrency(slotProps.data.price)}}</span>
@@ -97,7 +100,19 @@
         },
         mounted() {
             this.isLoggedIn = localStorage.getItem('vue-laravel-ecommerce.jwt') != null
-            axios.get("api/products/").then(response => this.products = response.data);
+            axios.get("api/products/").then(response => {
+                let products = response.data
+                products = products.map(product => {
+                const totalRatings = product.product_rating.reduce((acc, { rating }) => acc += Number(rating), 0)
+                const averageRating = totalRatings/product.product_rating.length
+                return {...product, averageRating}
+                })
+
+                this.products = products.map(product => {
+                const category = product.product_category.name
+                return {...product, category}
+                })
+            });
         },
         methods : {
             formatCurrency(value) {

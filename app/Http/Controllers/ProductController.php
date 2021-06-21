@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Order;
+use App\Models\ProductRating;
+use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
@@ -17,7 +19,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return response()->json(Product::all(), 200);
+        return response()->json(Product::with('product_rating', 'product_category')->get(), 200);
     }
 
     /**
