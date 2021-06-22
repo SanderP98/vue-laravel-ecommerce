@@ -21,13 +21,13 @@ class Order extends Model
     }
 
     public function product() {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Product::class)->withTrashed();
     }
 
     public function address() {
         return $this->belongsTo(Address::class, 'address_id');
     }
     public function order_details() {
-        return $this->hasMany(OrderDetails::class, 'order_id', 'id');
+        return $this->hasMany(OrderDetails::class, 'order_id', 'id')->withTrashed();
     }
 }

@@ -150,8 +150,8 @@ class ProductController extends Controller
             if( isset($waitingToBeShipped) && $waitingToBeShipped->count() ) {
                 $status .= '#'.$id . ', ';
             } else {
-                $image = Product::find($id)->value('image');
-                Storage::disk('images')->delete($image);
+                // $image = Product::find($id)->value('image');
+                // Storage::disk('images')->delete($image);
                 Product::find($id)->delete();
                 //check if this product has associated orders and order_details
                 if ( is_int($innerJoin) ) {
