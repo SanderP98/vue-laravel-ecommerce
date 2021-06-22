@@ -163,6 +163,7 @@ class OrderController extends Controller
             
         }
         Mail::to($payment->metadata->user->email)->send(new OrderCreatedMail($order));
+        return;
     }
 
     /**

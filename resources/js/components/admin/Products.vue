@@ -164,7 +164,7 @@
                 this.attachment = event.files[0] 
             },
             uploadFile() {
-                if ( this.attachment != null ) {
+                if ( this.attachment != null && this.product.id) {
                     var formData = new FormData();
                     formData.append("image", this.attachment)
                     let headers = {'Content-Type': 'multipart/form-data'}

@@ -66,7 +66,6 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         return response()->json($product, 200);
-        Log::info($product);
     }
 
     public function uploadFile(Request $request) {
@@ -109,7 +108,7 @@ class ProductController extends Controller
         $status = $product->update(
             $request->only([ 'name', 'description', 'units', 'price', 'image' ])
         );
-        Log::info($request->get('image'));
+        // Log::info($request->get('image'));
         return response()->json([
             'status' => $status,
             'message' => $status ? 'Product updated!' : 'Product not updated!'
@@ -148,7 +147,9 @@ class ProductController extends Controller
             if($waitingToBeShipped->count()) {
                 $status .= '#'.$id . ', ';
             } else {
-                $product = Product::find($id)->delete();
+                $image = Product::find($id)->value('image');
+                Storage::disk('images')->delete($image);
+                Product::find($id)->delete();
                 $order_details = OrderDetails::where('product_id', $id)->delete();
                 $order = Order::join('order_details', 'orders.id', '=', 'order_details.order_id')
                 ->where('order_details.order_id', $innerJoin)->delete();
@@ -162,7 +163,7 @@ class ProductController extends Controller
             $status = rtrim($status, ', ');
             $status = 'All products but: '.$status.' have been deleted, make sure to deliver the pending orders first.';
         }
-        Log::info($status);
+
         return response()->json([
             'status' => $status,
             'message' => !$status ? 'Products deleted' : $status ? : 'Products could not be deleted.'

@@ -63,7 +63,6 @@ class UserController extends Controller
 
     public function showOrders(User $user)
     {
-        Log::info($user->orders()->with('product', 'order_details', 'address')->get());
         return response()->json($user->orders()->with('order_details', 'order_details.product', 'address')->get());
     }
 
