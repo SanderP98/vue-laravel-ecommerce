@@ -20,7 +20,10 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return response()->json(Product::with('product_rating', 'product_category')->get(), 200);
+        return response()->json([
+            'products' => Product::with('product_rating', 'product_category')->get(),
+            'categories' => ProductCategory::all()
+        ]);
     }
 
     /**
@@ -135,27 +138,28 @@ class ProductController extends Controller
         $status = false;
         $ids = explode(",", $ids);
         foreach ($ids as $id) {
-            $innerJoin = OrderDetails::where('product_id', $id)->pluck('order_id');
-            if ($innerJoin->count()) {
-                $innerJoin = preg_replace("/[^A-Za-z0-9\-]/", '', $innerJoin);
+            $waitingToBeShipped=null;
+            $innerJoin = OrderDetails::where('product_id', $id)->value('order_id');
+            if ( is_int($innerJoin) ) {
                 $waitingToBeShipped = Order::where('is_delivered', 0)
                 ->join('order_details', 'orders.id', '=', 'order_details.order_id')
                 ->where('order_details.order_id', $innerJoin)
                 ->get();
             } 
 
-            if($waitingToBeShipped->count()) {
+            if( isset($waitingToBeShipped) && $waitingToBeShipped->count() ) {
                 $status .= '#'.$id . ', ';
             } else {
                 $image = Product::find($id)->value('image');
                 Storage::disk('images')->delete($image);
                 Product::find($id)->delete();
-                $order_details = OrderDetails::where('product_id', $id)->delete();
-                $order = Order::join('order_details', 'orders.id', '=', 'order_details.order_id')
-                ->where('order_details.order_id', $innerJoin)->delete();
+                //check if this product has associated orders and order_details
+                if ( is_int($innerJoin) ) {
+                    $order_details = OrderDetails::where('product_id', $id)->delete();
+                    $order = Order::join('order_details', 'orders.id', '=', 'order_details.order_id')
+                    ->where('order_details.order_id', $innerJoin)->delete();
+                }
             }
-            $waitingToBeShipped = '';
-            $innerJoin = '';
         }
 
 
