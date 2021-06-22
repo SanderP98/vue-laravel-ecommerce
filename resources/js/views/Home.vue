@@ -101,7 +101,7 @@
         mounted() {
             this.isLoggedIn = localStorage.getItem('vue-laravel-ecommerce.jwt') != null
             axios.get("api/products/").then(response => {
-                let products = response.data
+                let products = response.data.products
                 products = products.map(product => {
                 const totalRatings = product.product_rating.reduce((acc, { rating }) => acc += Number(rating), 0)
                 const averageRating = totalRatings/product.product_rating.length

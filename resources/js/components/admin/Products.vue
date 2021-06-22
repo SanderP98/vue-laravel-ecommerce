@@ -68,7 +68,7 @@
             </div>
             <div class="p-field">
                 <label for="category">Category</label>
-                <TextArea id="category" v-model="product.category" required="true" rows="3" cols="20" />
+                <Dropdown id="category" v-model="product.category" :options="categories" optionLabel="name" placeholder="Select a category"/>
             </div>
             <div class="p-field">
                 <label for="description">Description</label>
@@ -126,6 +126,7 @@
         data () {
             return {
                 products: [],
+                categories: [],
                 productDialog: false,
                 deleteProductDialog: false,
                 deleteProductsDialog: false,
@@ -144,7 +145,10 @@
             }
         },
         mounted() {
-            axios.get('/api/products/').then(response => this.products = response.data)
+            axios.get('/api/products/').then(response => {
+                this.products = response.data.products
+                this.categories = response.data.categories
+            });
         },
         methods : {
             formatCurrency(value) {
@@ -183,19 +187,20 @@
                     if (this.product.id) {
                         this.$set(this.products, this.findIndexById(this.product.id), this.product)
 
+                        let category = this.product.category.id
                         let name = this.product.name
                         let units = this.product.units
                         let price = this.product.price
                         let description = this.product.description
                         let image = newImage ? newImage : this.product.image
                         
-                        axios.put(`/api/products/${this.product.id}`, {name, units, price, description, image})
+                        axios.put(`/api/products/${this.product.id}`, {category, name, units, price, description, image})
                         .then(response => {
                             axios.get('/api/products/').then(response => this.products = response.data)
                             this.$toast.add({severity:'success', summary: 'Successful', detail: 'Product Updated', life: 3000});
                         });
                     } else {
-                        let category = this.product.category
+                        let category = this.product.category.id
                         let name = this.product.name
                         let units = this.product.units
                         let price = this.product.price
@@ -227,6 +232,7 @@
             },
             editProduct(product) {
                 this.chooseLabelText = product.image;
+                product.category = product.product_category
                 this.product = {...product};
                 this.productDialog = true;
             },
