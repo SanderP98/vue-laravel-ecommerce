@@ -69,7 +69,6 @@
             let url = `/api/orders/${this.$route.params.id}`
             axios.get(url).then(response => { 
                 let order = response.data 
-                console.log(order)
                 let checkUserMatch = order.find(o => o.user_id === this.user.id)
                 if ( checkUserMatch ) {
                     this.order = order;

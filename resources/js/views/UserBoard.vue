@@ -33,17 +33,15 @@
             Main, Orders, Order
         },
         beforeMount() {
-            if (this.$route.query.success) {
-                if(this.$parent.$emit('emptyCart')) {
-                    //
-                }
-            }
             this.$on('setComponent', this.setComponent)
-            if(this.$route.params.id) {
+            if (this.$route.query.success) {
+                this.$parent.$emit('emptyCart')
+            }
+            else if(this.$route.params.id) {
                 this.activeComponent = Order;
                 this.$router.push({ name: 'order-page', params: {page: 'orders', id: this.$route.params.id }}).catch(() => {});
             } 
-            else if (this.$route.params.page) 
+            else
             {
                 this.activeComponent = Main;   
                 this.setComponent(this.$route.params.page)
@@ -59,7 +57,7 @@
                 switch(value) {
                     case "main":
                         this.activeComponent = Main;
-                        this.$router.push({ name: 'user-pages', params: {page: 'main' }}).catch(() => {});
+                        this.$router.push({ name: 'userboard'}).catch(() => {});
                         break;
                     case "orders":
                         this.activeComponent = Orders;
