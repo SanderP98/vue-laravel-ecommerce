@@ -29,7 +29,7 @@
                 this.users = response.data;
             });
             axios.get('/api/products/').then(response => {
-                this.products = response.data
+                this.products = response.data.products
             });
             axios.get('/api/orders/').then(response => {
                 this.orders = response.data

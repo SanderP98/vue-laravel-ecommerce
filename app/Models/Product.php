@@ -15,7 +15,7 @@ class Product extends Model
     ];
 
     public function order_details() {
-        return $this->hasMany(Order::class);
+        return $this->hasMany(Order::class)->withTrashed();
     }
 
     public function product_rating() {

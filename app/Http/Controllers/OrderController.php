@@ -204,9 +204,9 @@ class OrderController extends Controller
      * @param  \App\Models\Order  $order
      * @return \Illuminate\Http\Response
      */
-    public function show(Order $order)
+    public function show($id)
     {
-        return response()->json(Order::with('order_details', 'order_details.product', 'address')->where('id', $order->id)->get(), 200);
+        return response()->json(Order::with('order_details', 'order_details.product', 'address')->where('id', $id)->withTrashed()->get());
     }
 
     /**
