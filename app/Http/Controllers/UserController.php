@@ -64,5 +64,9 @@ class UserController extends Controller
     public function showOrders(User $user)
     {
         return response()->json($user->orders()->with('order_details', 'order_details.product', 'address')->withTrashed()->get());
+    }   
+    public function showAddress(User $user)
+    {
+        return response()->json($user->address()->get());
     }
 }

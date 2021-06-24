@@ -44,6 +44,9 @@ import Card from 'primevue/card'
 import Divider from 'primevue/divider'
 import Avatar from 'primevue/avatar'
 import AvatarGroup from 'primevue/avatargroup'
+import Steps from 'primevue/steps'
+import RadioButton from 'primevue/radiobutton'
+import ScrollPanel from 'primevue/scrollpanel'
 
 //Services
 Vue.use(PrimeVue)
@@ -77,6 +80,9 @@ Vue.use(Card)
 Vue.use(Divider)
 Vue.use(Avatar)
 Vue.use(AvatarGroup)
+Vue.use(Steps)
+Vue.use(RadioButton)
+Vue.use(ScrollPanel)
 
 Vue.component('Toast', Toast)
 Vue.component('MultiSelect', MultiSelect)
@@ -104,6 +110,9 @@ Vue.component('Card', Card)
 Vue.component('Divider', Divider)
 Vue.component('Avatar', Avatar)
 Vue.component('AvatarGroup', AvatarGroup)
+Vue.component('Steps', Steps)
+Vue.component('RadioButton', RadioButton)
+Vue.component('ScrollPanel', ScrollPanel)
 
 
 //Views
@@ -113,9 +122,13 @@ import Login from './views/Login'
 import Register from './views/Register'
 import SingleProduct from './views/SingleProduct'
 import Checkout from './views/Checkout'
+import Address from './components/order-steps/Address'
+import Payment from './components/order-steps/Payment'
+import OrderCheck from './components/order-steps/OrderCheck'
 import Confirmation from './views/Confirmation'
 import UserBoard from './views/UserBoard'
 import Admin from './views/Admin'
+import Cart from './views/Cart'
 
 const router = new VueRouter({
     mode: 'history',
@@ -146,11 +159,39 @@ const router = new VueRouter({
             component: Confirmation
         },
         {
-            path: '/checkout',
-            name: 'checkout',
-            component: Checkout,
+            path: '/cart',
+            name: 'cart',
+            component: Cart,
+            meta: {
+                requiresAuth: true,
+            },
             props: (route) => ({ pid: route.query.pid })
+        },        
+        {
+            path: '/checkout',
+            component: Checkout,
+            children: [
+                {
+                // path: '',
+                //     component: Personal,
+                // }, later afrekenen als gast toevoegen               
+                    path: '',
+                    component: Address,
+                },
+                {
+                    path: '/checkout/payment',
+                    component: Payment,
+                },                
+                {
+                    path: '/checkout/confirm',
+                    component: OrderCheck,
+                }
+            ],
+            meta: {
+                requiresAuth: true,
+            }
         },
+
         {
             path: '/dashboard/:page',
             name: 'user-pages',
@@ -165,7 +206,8 @@ const router = new VueRouter({
             meta: {
                 requiresAuth: true,
                 is_user: true
-            }
+            },
+            props: (route) => ({ success: route.query.success })
         },
         {
             path: '/dashboard',

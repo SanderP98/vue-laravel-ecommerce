@@ -44,11 +44,14 @@ class OrderController extends Controller
     {   
         $products = $request->get('products');
         $totalPrice = number_format($request->get('totalPrice'), 2, '.', '');
+        // Payment Methods can not be enabled when not being registered as a business, but it does work.
+        $method = $request->get('paymentMethod');
         $payment = Mollie::api()->payments()->create([
             'amount' => [
                 'currency' => 'EUR', // Type of currency you want to send
                 'value' => $totalPrice, // You must send the correct number of decimals, thus we enforce the use of strings
             ],
+            'method' => $method,
             'description' => "Beschrijving", 
             'webhookUrl' => route('webhooks.mollie'),
             'redirectUrl' => route('payment.success'),

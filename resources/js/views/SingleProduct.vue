@@ -12,7 +12,7 @@
                 <br>
                 <hr>
                 <div class="text-right">
-                <router-link :to="{ path: '/checkout?pid='+product.id }" class="col-md-4 p-button">Buy Now</router-link>
+                <router-link :to="{ path: '/cart?pid='+product.id }" class="col-md-4 p-button">Buy Now</router-link>
                 <Button icon="pi pi-shopping-cart" :disabled="product.units === '0'" @click="addToCart(product)"></Button>
                 </div>
             </div>

@@ -62,7 +62,7 @@
                                     </template>
                                 </Column> -->
                             </DataTable>
-                            <router-link :to="{ name: 'checkout' }" v-if="user_type == 0 || user_type == 1"><Button class="p-button-raised float-right m-2" @click="showCart()">Checkout</Button></router-link>
+                            <router-link :to="{ name: 'cart' }" v-if="user_type == 0 || user_type == 1"><Button class="p-button-raised float-right m-2" @click="showCart()">Checkout</Button></router-link>
                         </OverlayPanel>
                     </ul>
                 </div>
@@ -98,7 +98,7 @@
         mounted() {
             this.setDefaults()
             this.$on('addToCart', this.addToCart)
-            this.$on('emptyCart', this.emptyCart())
+            // this.$on('emptyCart', this.emptyCart())
             if (localStorage.getItem('vue-laravel-ecommerce.shopCart')) {
                 this.cartItems = Object.values(JSON.parse(localStorage.getItem('vue-laravel-ecommerce.shopCart')));
                 this.totalItems = String(this.cartItems.reduce((total, item)=> {
@@ -138,6 +138,7 @@
                 this.$refs.op.toggle(event);
             },
             addToCart(product) {
+                console.log('test')
                 let findProduct = this.cartItems.find(o => o.id === product.id)
                 if(findProduct){
                     findProduct.quantity +=1;

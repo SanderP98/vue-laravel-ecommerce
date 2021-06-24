@@ -46,4 +46,8 @@ class User extends Authenticatable
     public function orders() {
         return $this->hasMany(Order::class)->withTrashed();
     }
+
+    public function address() {
+        return $this->hasOne(Address::class);
+    }
 }

@@ -21,6 +21,7 @@
     import Orders from '../components/user/Orders'
     import Order from '../components/user/Order'
     export default {
+        props: ['success'],
         data() {
             return {
                 user : null,
@@ -34,8 +35,10 @@
         },
         beforeMount() {
             this.$on('setComponent', this.setComponent)
-            if (this.$route.query.success) {
+            if ( this.$route.query.success ) {
                 this.$parent.$emit('emptyCart')
+                this.activeComponent = Main;   
+                this.setComponent(this.$route.params.page)
             }
             else if(this.$route.params.id) {
                 this.activeComponent = Order;

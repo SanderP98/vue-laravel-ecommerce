@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <div class="row">
+        <!-- <div class="row">
             <div class="col-md-8 offset-md-2">
                 <div class="order-box" v-for="(product, index) in products" :key="index">
                     <img :src="'/images/'+product.image" :alt="product.name" height="50px" width="50px">
@@ -10,7 +10,7 @@
                     <br>
                     <hr>
                     <label class="row"><span class="col-md-2 float-left">Quantity: </span><input type="number" name="quantity" min="1" :max="product.units" v-model="product.quantity" class="col-md-2 float-left" @input="checkUnits(product)"></label>
-                    <!-- <InputNumber v-model="product.quantity" :min="1" :max="product.units" /> -->
+                    <InputNumber v-model="product.quantity" :min="1" :max="product.units" />
                 </div>
                 <br>
                 <div>
@@ -20,19 +20,31 @@
                         <button class="col-md-4 btn btn-danger float-right" @click="register">Create an account</button>
                     </div>
                     <div v-if="isLoggedIn">
-                        <!-- <div class="row">
+                        <div class="row">
                             <label for="address" class="col-md-3 col-form-label">Delivery Address</label>
                             <div class="col-md-9">
                                 <input id="address" type="text" class="form-control" v-model="address" required>
                             </div>
                         </div>
-                        <br> -->
+                        <br>
                         <button class="col-md-4 btn btn-sm btn-success float-right" v-if="isLoggedIn" @click="placeOrder">Continue</button>
                     </div>
                 </div>
             </div>
+        </div> -->
+
+            <div class="content-section implementation">
+                <div class="p-card p-mb-4">
+                    <div class="p-card-body">
+                        <Steps :model="items" :readonly="true" />  
+                    </div>
+                </div>
+
+                <keep-alive>
+                    <router-view :formData="formObject" @prevPage="prevPage($event)" @nextPage="nextPage($event)" @complete="complete" />
+                </keep-alive>
+            </div>
         </div>
-    </div>
 </template>
 
 <script>
@@ -40,37 +52,63 @@
         props : ['pid'],
         data () {
             return {
-                address : "",
-                isLoggedIn : null,
-                products : [],
-                product: {},
-                totalPrice: 0,
+                // address : "",
+                // isLoggedIn : null,
+                // products : [],
+                // product: {},
+                // totalPrice: 0,
+                user: null,
+                items: [
+                    {
+                        label: 'Address',
+                        to: '/checkout'
+                    },
+                    {
+                        label: 'Payment',
+                        to: '/checkout/payment' 
+                    },
+                    {
+                        label: 'Confirm',
+                        to: '/checkout/confirm'
+                    },
+                    // {
+                    //     label: 'Payment',
+                    //     to: '/steps/payment'
+                    // },
+                    // {
+                    //     label: 'Confirmation',
+                    //     to: '/steps/confirmation'
+                    // }
+                ],
+                formObject: {},
             }
         },
         mounted() {
             this.isLoggedIn = localStorage.getItem('vue-laravel-ecommerce.jwt') != null
         },
         beforeMount() {
-            if ( this.$route.query.pid ) {
-                axios.get(`/api/products/${this.pid}`).then(response => {
-                    this.product.id = response.data.id
-                    this.product.name = response.data.name
-                    this.product.units = response.data.units
-                    this.product.image = response.data.image
-                    this.product.price = response.data.price
-                    this.product.quantity = 1
-                    this.products.push(this.product);
-                    this.product = []
+            // if ( this.$route.query.pid ) {
+            //     axios.get(`/api/products/${this.pid}`).then(response => {
+            //         this.product.id = response.data.id
+            //         this.product.name = response.data.name
+            //         this.product.units = response.data.units
+            //         this.product.image = response.data.image
+            //         this.product.price = response.data.price
+            //         this.product.quantity = 1
+            //         this.products.push(this.product);
+            //         this.product = []
 
-                });
-            } else {
-                this.products = JSON.parse(localStorage.getItem('vue-laravel-ecommerce.shopCart')); 
-            }
+            //     });
+            // } else {
+            //     this.products = JSON.parse(localStorage.getItem('vue-laravel-ecommerce.shopCart')); 
+            // }
             if ( localStorage.getItem('vue-laravel-ecommerce.jwt' ) != null ) {
                 this.user = JSON.parse(localStorage.getItem('vue-laravel-ecommerce.user'))
+                axios.defaults.headers.common['Access-Control-Allow-Headers'] = '*'
+                axios.defaults.headers.common['Access-Control-Allow-Methods'] = '*'
                 axios.defaults.headers.common['Content-Type'] = 'application/json'
                 axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('vue-laravel-ecommerce.jwt')
-                console.log(this.products);
+                // console.log(this.products);
             }
         },
         methods : {
@@ -103,12 +141,50 @@
                 }
                 this.$forceUpdate();
             },
+            nextPage(event) {
+                console.log(event.formData)
+                for (let field in event.formData) {
+                    this.formObject[field] = event.formData[field];
+                }
+                this.$router.push(this.items[event.pageIndex + 1].to);
+            },
+            prevPage(event) {
+                this.$router.push(this.items[event.pageIndex - 1].to);
+            },
+            complete(event) {
+                for (let field in event.formData) {
+                    this.formObject[field] = event.formData[field];
+                }
+                let address_id = this.formObject.address_id
+                let country = this.formObject.address.country
+                let address = this.formObject.address.address
+                let address_2 = this.formObject.address.address_2
+                let city = this.formObject.address.city
+                let state = this.formObject.address.state
+                let postal_code = this.formObject.address.postal_code
+                let user = this.user.id
+                if ( !this.formObject.hasAddress ) {
+                    //store     
+                    axios.post(`/api/address`, { user, country, address, address_2, city, state, postal_code });              
+                } else if ( this.formObject.hasAddress && this.formObject.editAddress ) {
+                    //update
+                    axios.put(`/api/address/${address_id}`, { user, country, address, address_2, city, state, postal_code }); 
+                }
+                let products = JSON.parse(localStorage.getItem('vue-laravel-ecommerce.shopCart'))
+                let totalPrice = products.reduce((total, item)=> {
+                    return total + item.quantity * item.price;
+                }, 0);
+                let paymentMethod = this.formObject.paymentMethod
+                axios.post('/api/molliepayment', { products, totalPrice, paymentMethod }).then(response => {
+                    window.location.href = response.data.data._links.checkout.href;
+                }).catch(() => {});
+            }
         }
     }
 </script>
 
 
-<style scoped>
+<style lang="scss" scoped>
 .small-text { 
     font-size: 18px; 
 }
@@ -117,5 +193,11 @@
 }
 .title { 
     font-size: 36px; 
+}
+::v-deep(b) {
+    display: block;
+}
+::v-deep(.p-card-body) {
+    padding: 2rem;
 }
 </style>

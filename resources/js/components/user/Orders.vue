@@ -96,6 +96,7 @@
 
 <script>
     export default {
+        props : ['success'],
         data () {
             return {
                 orders: [],
