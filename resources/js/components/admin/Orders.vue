@@ -49,7 +49,7 @@
                 </Column> -->
                 <Column field="address" header="Delivery Address" sortable>
                     <template #body="slotProps">
-                        {{slotProps.data.address.country + ", " + slotProps.data.address.address + ", " + slotProps.data.address.address_2 + ", " + slotProps.data.address.city + ", " + slotProps.data.address.zip_code}}
+                        {{slotProps.data.address.country + ", " + slotProps.data.address.address + ", "}}<span v-if="slotProps.data.address.address_2 !== null">{{slotProps.data.address.address_2 + ", "}}</span>{{slotProps.data.address.city + ", " + slotProps.data.address.postal_code}}
                     </template>                
                 </Column>
                 <Column field="order_status" header="Status" sortable>
