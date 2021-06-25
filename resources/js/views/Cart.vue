@@ -88,10 +88,6 @@ export default {
             // }).catch(() => {});
         },
         checkUnits(product) {
-
-            if ( product.quantity > product.units ) {
-                product.quantity = product.units
-            }
             this.$parent.$emit('changeQuantityCartItem', product)
             this.$forceUpdate();
         },

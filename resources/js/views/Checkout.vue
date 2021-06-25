@@ -123,24 +123,22 @@
             register() {
                 this.$router.push({ name: 'register', params: {nextUrl: this.$route.fullPath }}).catch(() => {});
             },
-            placeOrder(e) {
-                e.preventDefault();
+            // placeOrder(e) {
+            //     e.preventDefault();
 
-                let products = this.products
-                let totalPrice = this.products.reduce((total, item)=> {
-                    return total + item.quantity * item.price;
-                }, 0);
+            //     let products = this.products
+            //     let totalPrice = this.products.reduce((total, item)=> {
+            //         return total + item.quantity * item.price;
+            //     }, 0);
 
-                axios.post('api/molliepayment', { products, totalPrice }).then(response => {
-                    window.location.href = response.data.data._links.checkout.href;
-                }).catch(() => {});
-            },
-            checkUnits(product) {
-                if ( product.quantity > product.units ) {
-                    product.quantity = product.units
-                }
-                this.$forceUpdate();
-            },
+            //     axios.post('api/molliepayment', { products, totalPrice }).then(response => {
+            //         window.location.href = response.data.data._links.checkout.href;
+            //     }).catch(() => {});
+            // },
+            // checkUnits(product) {
+            //     this.$parent.$emit('changeQuantityCartItem', product)
+            //     this.$forceUpdate();
+            // },
             nextPage(event) {
                 console.log(event.formData)
                 for (let field in event.formData) {

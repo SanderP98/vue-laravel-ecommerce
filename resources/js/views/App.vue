@@ -178,7 +178,6 @@
                     } else {
                         findProduct.quantity = product.quantity;
                     }
-
                     findProduct.subtotal = product.quantity * findProduct.price;
                 }    
                 this.storeToCart();           
