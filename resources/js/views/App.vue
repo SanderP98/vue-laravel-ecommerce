@@ -18,7 +18,7 @@
 
                     </ul>
                     <ul class="navbar-nav mr-auto">
-                        <li v-if="isLoggedIn" class="nav-link"><Button :disabled="totalItems == '0'" icon="pi pi-shopping-cart" id="body" class="p-button-raised p-button-rounded p-button-secondary" :label="totalItems" @click="showCart" /></li> <!---->
+                        <li v-if="isLoggedIn" class="nav-link"><Button :disabled="totalItems == '0'" icon="pi pi-shopping-cart" id="body" class="p-button-raised p-button-rounded p-button-secondary" :label="String(totalItems)" @click="showCart" /></li> <!---->
                         <li class="nav-link" v-if="isLoggedIn" @click="logout"><Button v-if="isLoggedIn" icon="pi pi-sign-in" label="Log out" class="p-button-raised p-button-danger p-button-rounded"/></li>
                         <OverlayPanel ref="op" appendTo="body" :showCloseIcon="true" id="overlay_panel" style="width: 550px">
 
@@ -91,7 +91,8 @@
                 },
                 totalPrice: 0,
                 quantity: 0,
-                totalItems: "0",
+                totalItems: 0,
+                totalItemsString: '0',
                 isLoggedIn: localStorage.getItem('vue-laravel-ecommerce.jwt') != null
             }
         },
@@ -110,6 +111,7 @@
         created() {
             this.$on('emptyCart', this.emptyCart)
             this.$on('addToCart', this.addToCart)
+            this.$on('changeQuantityCartItem', this.changeQuantityCartItem)
         },
         methods : {
             formatCurrency(value) {
@@ -140,6 +142,7 @@
                 this.$refs.op.toggle(event);
             },
             addToCart(product) {
+                console.log()
                 let findProduct = this.cartItems.find(o => o.id === product.id)
                 if(findProduct){
                     findProduct.quantity +=1;
@@ -158,19 +161,24 @@
                 this.storeToCart();
             },
             storeToCart() {
-                let parsed = JSON.stringify(this.cartItems);
-                localStorage.setItem('vue-laravel-ecommerce.shopCart', parsed)
-                this.totalItems = String(this.cartItems.reduce((total, item)=> {
-                    return total + item.quantity;
-                }, 0));
+                this.totalItems = this.cartItems.reduce((total, item)=> {
+                    return total + parseInt(item.quantity);
+                }, 0);
                 this.totalPrice = this.cartItems.reduce((total, item)=> {
                     return total + item.subtotal;
                 }, 0);
+                let parsed = JSON.stringify(this.cartItems);
+                localStorage.setItem('vue-laravel-ecommerce.shopCart', parsed)
             },
             changeQuantityCartItem(product) {
                 let findProduct = this.cartItems.find(o => o.id === product.id)
                 if (findProduct) {
-                    findProduct.quantity = product.quantity;
+                    if ( product.quantity > product.units ) {
+                        product.quantity = product.units
+                    } else {
+                        findProduct.quantity = product.quantity;
+                    }
+
                     findProduct.subtotal = product.quantity * findProduct.price;
                 }    
                 this.storeToCart();           
@@ -187,7 +195,7 @@
                 this.cartItems = [];
                 this.totalPrice = 0;
                 this.totalItems = "0";
-            }
+            },
         },
     }
 </script>
