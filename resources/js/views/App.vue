@@ -97,8 +97,6 @@
         },
         mounted() {
             this.setDefaults()
-            this.$on('addToCart', this.addToCart)
-            // this.$on('emptyCart', this.emptyCart())
             if (localStorage.getItem('vue-laravel-ecommerce.shopCart')) {
                 this.cartItems = Object.values(JSON.parse(localStorage.getItem('vue-laravel-ecommerce.shopCart')));
                 this.totalItems = String(this.cartItems.reduce((total, item)=> {
@@ -108,6 +106,10 @@
                     return total + item.subtotal;
                 }, 0);
             }
+        },
+        created() {
+            this.$on('emptyCart', this.emptyCart)
+            this.$on('addToCart', this.addToCart)
         },
         methods : {
             formatCurrency(value) {
@@ -138,7 +140,6 @@
                 this.$refs.op.toggle(event);
             },
             addToCart(product) {
-                console.log('test')
                 let findProduct = this.cartItems.find(o => o.id === product.id)
                 if(findProduct){
                     findProduct.quantity +=1;

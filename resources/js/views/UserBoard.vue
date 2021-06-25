@@ -36,9 +36,9 @@
         beforeMount() {
             this.$on('setComponent', this.setComponent)
             if ( this.$route.query.success ) {
-                this.$parent.$emit('emptyCart')
                 this.activeComponent = Main;   
                 this.setComponent(this.$route.params.page)
+                this.$parent.$emit('emptyCart')
             }
             else if(this.$route.params.id) {
                 this.activeComponent = Order;

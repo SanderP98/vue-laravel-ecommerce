@@ -42,33 +42,37 @@ class OrderController extends Controller
     }
     public function preparePayment(Request $request)
     {   
-        $products = $request->get('products');
-        $totalPrice = number_format($request->get('totalPrice'), 2, '.', '');
-        // Payment Methods can not be enabled when not being registered as a business, but it does work.
-        $method = $request->get('paymentMethod');
-        $payment = Mollie::api()->payments()->create([
-            'amount' => [
-                'currency' => 'EUR', // Type of currency you want to send
-                'value' => $totalPrice, // You must send the correct number of decimals, thus we enforce the use of strings
-            ],
-            'method' => $method,
-            'description' => "Beschrijving", 
-            'webhookUrl' => route('webhooks.mollie'),
-            'redirectUrl' => route('payment.success'),
-            "metadata" => [
-                "products" => $products,
-                "user_id" => Auth::id(),
-                "user" => Auth::user(),
-                "totalPrice" => $totalPrice,
-            ], 
-        ]);
-    
-        $payment = Mollie::api()->payments()->get($payment->id);
-    
-        // redirect customer to Mollie checkout page
-        return response()->json([
-            'data' => $payment,
-        ]);
+        if ( $request ) {
+            $products = $request->get('products');
+            $totalPrice = number_format($request->get('totalPrice'), 2, '.', '');
+            // Payment Methods can not be enabled when not being registered as a business, but it does work.
+            $method = $request->get('paymentMethod');
+            $payment = Mollie::api()->payments()->create([
+                'amount' => [
+                    'currency' => 'EUR', // Type of currency you want to send
+                    'value' => $totalPrice, // You must send the correct number of decimals, thus we enforce the use of strings
+                ],
+                'method' => $method,
+                'description' => "Beschrijving", 
+                'webhookUrl' => route('webhooks.mollie'),
+                'redirectUrl' => route('payment.success'),
+                "metadata" => [
+                    "products" => $products,
+                    "user_id" => Auth::id(),
+                    "user" => Auth::user(),
+                    "totalPrice" => $totalPrice,
+                ], 
+            ]);
+        
+            $payment = Mollie::api()->payments()->get($payment->id);
+        
+            // redirect customer to Mollie checkout page
+            return response()->json([
+                'data' => $payment,
+            ]);
+        } else {
+            return redirect()->to('/');           
+        }
     }
     public function paymentSuccess(Request $request) {
         //Hier de bestelling afronden en de status op betaald zetten.
