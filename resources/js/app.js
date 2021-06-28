@@ -174,7 +174,8 @@ const router = new VueRouter({
                 {
                 // path: '',
                 //     component: Personal,
-                // }, later afrekenen als gast toevoegen               
+                // }, later afrekenen als gast toevoegen 
+                    name: 'checkout',              
                     path: '',
                     component: Address,
                 },
@@ -189,7 +190,8 @@ const router = new VueRouter({
             ],
             meta: {
                 requiresAuth: true,
-            }
+            },
+            props: true
         },
 
         {
@@ -207,7 +209,7 @@ const router = new VueRouter({
                 requiresAuth: true,
                 is_user: true
             },
-            props: (route) => ({ success: route.query.success })
+            props: (route) => ({ success: route.query.clear_cart })
         },
         {
             path: '/dashboard',

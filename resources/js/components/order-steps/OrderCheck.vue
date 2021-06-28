@@ -53,14 +53,21 @@
 <script>
 
 export default {
+    props: ['pid', 'formData'],
     data () {
         return {
             products: [],
         }
     },
     beforeMount() {
-        this.products = JSON.parse(localStorage.getItem('vue-laravel-ecommerce.shopCart'));
-        // console.log(this.products)
+        if( Object.entries(this.$props.formData).length === 0 ) {
+            this.$router.push({ path: '/' })
+        }
+        if ( Object.entries(this.$props.pid).length !== 0 ) {
+            this.products = this.$props.pid
+        } else {
+            this.products = JSON.parse(localStorage.getItem('vue-laravel-ecommerce.shopCart'));
+        }
     },
     methods : {
         formatCurrency(value) {
@@ -81,7 +88,11 @@ export default {
             // }).catch(() => {});
         },
         checkUnits(product) {
-            this.$parent.$parent.$emit('changeQuantityCartItem', product)
+            if ( Object.entries(this.$props.pid).length === 0 ) {
+                this.$parent.$parent.$emit('changeQuantityCartItem', product)
+            } else { 
+                this.$parent.$emit('updateQuantityNonCartItem', product)
+            }
             this.$forceUpdate();
         },
     }

@@ -15,7 +15,7 @@
                 </div>
             </template>
             <template #list="slotProps">
-                <div class="p-col-12">
+                <div class="p-col-12" v-if="slotProps.data.units !== 0">
                     <div class="product-list-item">
                         <img :src="'/images/' + slotProps.data.image" :alt="slotProps.data.name"/>
                         <div class="product-list-detail">
@@ -34,7 +34,7 @@
             </template>
 
             <template #grid="slotProps">
-                <div class="p-col-12 p-md-4">
+                <div class="p-col-12 p-md-4" v-if="slotProps.data.units !== 0">
                     <div class="product-grid-item card">
                         <div class="product-grid-item-content">
                             <img :src="'/images/' + slotProps.data.image" :alt="slotProps.data.name"/>
@@ -45,12 +45,12 @@
                         <div class="product-grid-item-bottom">
                             <span class="product-price">{{formatCurrency(slotProps.data.price)}}</span>
                             <div class="row">
-                                <router-link :to="{ path: '/products/'+slotProps.data.id }"><Button class="btn btn-primary mr-2" :disabled="slotProps.data.units === '0'">Buy now</Button></router-link>
+                                <router-link :to="{ path: '/products/'+slotProps.data.id }"><Button class="btn btn-primary mr-2">Buy now</Button></router-link>
                                 <div v-if="!isLoggedIn">
                                     <router-link :to="{ path: 'login' }"><Button icon="pi pi-shopping-cart"></Button></router-link>                                   
                                 </div>
                                 <div v-if="isLoggedIn">
-                                    <Button icon="pi pi-shopping-cart" :disabled="slotProps.data.units === '0'" @click="addToCart(slotProps.data)"></Button>
+                                    <Button icon="pi pi-shopping-cart" :disabled="slotProps.data.units == '0'" @click="addToCart(slotProps.data)"></Button>
                                 </div>
                             </div>
                         </div>
@@ -142,9 +142,6 @@
 </script>
 
 <style lang="scss" scoped>
-.custom-carousel {
-    //background: #000000;
-}
 .product-item {
     .product-item-content {
         border: 1px solid var(--surface-d);

@@ -21,7 +21,7 @@
     import Orders from '../components/user/Orders'
     import Order from '../components/user/Order'
     export default {
-        props: ['success'],
+        props: ['clear_cart'],
         data() {
             return {
                 user : null,
@@ -35,7 +35,7 @@
         },
         beforeMount() {
             this.$on('setComponent', this.setComponent)
-            if ( this.$route.query.success ) {
+            if ( this.$route.query.clear_cart ) {
                 this.activeComponent = Main;   
                 this.setComponent(this.$route.params.page)
                 this.$parent.$emit('emptyCart')

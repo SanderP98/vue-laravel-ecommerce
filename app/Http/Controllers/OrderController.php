@@ -44,6 +44,10 @@ class OrderController extends Controller
     {   
         if ( $request ) {
             $products = $request->get('products');
+            Log::info($products);
+            // if (!is_object($products)) {
+            //     $products = (object) $products;
+            // }
             $totalPrice = number_format($request->get('totalPrice'), 2, '.', '');
             // Payment Methods can not be enabled when not being registered as a business, but it does work.
             $method = $request->get('paymentMethod');
@@ -55,7 +59,7 @@ class OrderController extends Controller
                 'method' => $method,
                 'description' => "Beschrijving", 
                 'webhookUrl' => route('webhooks.mollie'),
-                'redirectUrl' => route('payment.success'),
+                'redirectUrl' => route('payment.success', ['is_singular' => $request->get('isSingleProduct') ? $request->get('isSingleProduct') : 0]),
                 "metadata" => [
                     "products" => $products,
                     "user_id" => Auth::id(),
@@ -74,11 +78,26 @@ class OrderController extends Controller
             return redirect()->to('/');           
         }
     }
-    public function paymentSuccess(Request $request) {
+    public function paymentSuccess(Request $request, $id) {
         //Hier de bestelling afronden en de status op betaald zetten.
         //$payment = Mollie::api()->payments->get($request->id);
+        // if (! $request->has('id')) {
+        //     return;
+        // }
+        // $payment = Mollie::api()->payments()->get($request->id);
 
-        return redirect()->to('/dashboard/orders?success=1');
+        // if ( $payment->metadata->isSingleProduct == true ) {
+        //     return redirect()->to('/dashboard/orders');           
+        // } else {
+        //     return redirect()->to('/dashboard/orders?success=1');
+        // }
+        // return response()->json(['data' => 'test']);
+        Log::info($id);
+        if ( $id == 0 ) {
+            return redirect()->to('/dashboard/orders?clear_cart=1');
+        } else {
+            return redirect()->to('/dashboard/orders');       
+        }
     }
     
     public function webhook(Request $request) {
@@ -170,7 +189,6 @@ class OrderController extends Controller
             
         }
         Mail::to($payment->metadata->user->email)->send(new OrderCreatedMail($order));
-        return;
     }
 
     /**

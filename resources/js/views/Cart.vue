@@ -38,6 +38,7 @@ export default {
             products : [],
             product: {},
             totalPrice: 0,
+            quantity: 0,
         }
     },
     beforeMount() {
@@ -77,18 +78,36 @@ export default {
         },
         placeOrder(e) {
             e.preventDefault();
-            this.$router.push({ path: '/checkout', params: {nextUrl: this.$route.fullPath }}).catch(() => {});
-            let products = this.products
-            let totalPrice = this.products.reduce((total, item)=> {
-                return total + item.quantity * item.price;
-            }, 0);
+            if ( this.$route.query.pid ) {
+                this.$router.push({ name: 'checkout', params: {nextUrl: this.$route.fullPath, pid: this.$route.query.pid, quantity: this.quantity }}).catch(() => {});
+            } else {
+                this.$router.push({ path: '/checkout', params: {nextUrl: this.$route.fullPath }}).catch(() => {});               
+            }
+            // let products = this.products
+            // let totalPrice = this.products.reduce((total, item)=> {
+            //     return total + item.quantity * item.price;
+            // }, 0);
 
-            // axios.post('api/molliepayment', { products, totalPrice }).then(response => {
-            //     window.location.href = response.data.data._links.checkout.href;
-            // }).catch(() => {});
+            // // axios.post('api/molliepayment', { products, totalPrice }).then(response => {
+            // //     window.location.href = response.data.data._links.checkout.href;
+            // // }).catch(() => {});
         },
         checkUnits(product) {
-            this.$parent.$emit('changeQuantityCartItem', product)
+            if ( !this.$route.query.pid ) {
+                this.$parent.$emit('changeQuantityCartItem', product)
+            } else {
+                let findProduct = this.products.find(o => o.id === product.id)
+                if (findProduct) {
+                    if ( product.quantity > product.units ) {
+                        product.quantity = product.units
+                    } else {
+                        findProduct.quantity = product.quantity;
+                    }
+                    findProduct.subtotal = product.quantity * findProduct.price;
+                    this.quantity = findProduct.quantity
+                }    
+            }
+
             this.$forceUpdate();
         },
     }

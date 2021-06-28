@@ -36,12 +36,12 @@
             <div class="content-section implementation">
                 <div class="p-card p-mb-4">
                     <div class="p-card-body">
-                        <Steps :model="items" :readonly="true" />  
+                        <Steps :model="items" :readonly="true" /> 
                     </div>
                 </div>
 
                 <keep-alive>
-                    <router-view :formData="formObject" @prevPage="prevPage($event)" @nextPage="nextPage($event)" @complete="complete" />
+                    <router-view :formData="formObject" :pid="this.products" @prevPage="prevPage($event)" @nextPage="nextPage($event)" @complete="complete" />
                 </keep-alive>
             </div>
         </div>
@@ -49,7 +49,7 @@
 
 <script>
     export default {
-        props : ['pid'],
+        props : ['pid', 'quantity'],
         data () {
             return {
                 // address : "",
@@ -57,6 +57,7 @@
                 // products : [],
                 // product: {},
                 // totalPrice: 0,
+                singleProduct: false,
                 user: null,
                 items: [
                     {
@@ -81,27 +82,44 @@
                     // }
                 ],
                 formObject: {},
+                product: {
+                    id: 0,
+                    name: 0,
+                    price: 0,
+                    quantity: 0,
+                    image: '',
+                    units: 0,
+                },
+                products: [],
             }
+        },
+        created() {
+
         },
         mounted() {
             this.isLoggedIn = localStorage.getItem('vue-laravel-ecommerce.jwt') != null
         },
         beforeMount() {
-            // if ( this.$route.query.pid ) {
-            //     axios.get(`/api/products/${this.pid}`).then(response => {
-            //         this.product.id = response.data.id
-            //         this.product.name = response.data.name
-            //         this.product.units = response.data.units
-            //         this.product.image = response.data.image
-            //         this.product.price = response.data.price
-            //         this.product.quantity = 1
-            //         this.products.push(this.product);
-            //         this.product = []
-
-            //     });
+            console.log(this.$route.params.pid);
+            console.log(this.$route.params.quantity);
+            // console.log(this.pid)
+            if ( this.$route.params.pid ) {
+                this.singleProduct = true;
+                axios.get(`/api/products/${this.pid}`).then(response => {
+                    this.product.id = response.data.id
+                    this.product.name = response.data.name
+                    this.product.units = response.data.units
+                    this.product.image = response.data.image
+                    this.product.price = response.data.price
+                    this.product.quantity = this.$route.params.quantity
+                    this.products.push(this.product);
+                    this.product = []
+                });
+            }
             // } else {
             //     this.products = JSON.parse(localStorage.getItem('vue-laravel-ecommerce.shopCart')); 
             // }
+
             if ( localStorage.getItem('vue-laravel-ecommerce.jwt' ) != null ) {
                 this.user = JSON.parse(localStorage.getItem('vue-laravel-ecommerce.user'))
                 axios.defaults.headers.common['Access-Control-Allow-Headers'] = '*'
@@ -110,6 +128,9 @@
                 axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('vue-laravel-ecommerce.jwt')
                 // console.log(this.products);
             }
+        },
+        created () {
+            this.$on('updateQuantityNonCartItem', this.updateQuantityNonCartItem)
         },
         methods : {
             formatCurrency(value) {
@@ -140,7 +161,7 @@
             //     this.$forceUpdate();
             // },
             nextPage(event) {
-                console.log(event.formData)
+                //console.log(event.formData)
                 for (let field in event.formData) {
                     this.formObject[field] = event.formData[field];
                 }
@@ -168,14 +189,45 @@
                     //update
                     axios.put(`/api/address/${address_id}`, { user, country, address, address_2, city, state, postal_code }); 
                 }
-                let products = JSON.parse(localStorage.getItem('vue-laravel-ecommerce.shopCart'))
+                if ( this.singleProduct == true ) {
+                    var products = this.products
+                } else {
+                    var products = JSON.parse(localStorage.getItem('vue-laravel-ecommerce.shopCart'))        
+                }
                 let totalPrice = products.reduce((total, item)=> {
                     return total + item.quantity * item.price;
                 }, 0);
                 let paymentMethod = this.formObject.paymentMethod
-                axios.post('/api/molliepayment', { products, totalPrice, paymentMethod }).then(response => {
+                let isSingleProduct = this.singleProduct
+                axios.post('/api/molliepayment', { products, totalPrice, paymentMethod, isSingleProduct }).then(response => {
                     window.location.href = response.data.data._links.checkout.href;
+                    // if (response.data.data.status == "paid") {
+                    //     alert('betaald')
+                    // }
+                    // let config = {
+                    // headers: {
+                    //     'Content-Type': 'application/json;charset=UTF-8',
+                    //     "Access-Control-Allow-Origin": "*",
+                    // }
+                    // }
+                    // axios.get(response.data.data._links.self.href, config).then(response => {
+                    //     console.log(response.data.data)
+                    // })
+
                 }).catch(() => {});
+                this.singleProduct = false;
+            },
+            updateQuantityNonCartItem(product) {
+                let findProduct = this.products.find(o => o.id === product.id)
+                if (findProduct) {
+                    console.log(findProduct)
+                    if ( product.quantity > product.units ) {
+                        product.quantity = product.units
+                    } else {
+                        findProduct.quantity = product.quantity;
+                    }
+                    findProduct.subtotal = product.quantity * findProduct.price;
+                } 
             }
         }
     }

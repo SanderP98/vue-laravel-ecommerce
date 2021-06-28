@@ -24,7 +24,7 @@ Route::post('register', [UserController::class, 'register']);
 Route::get('/products', [ProductController::class, 'index']);
 Route::post('/upload-file', [ProductController::class, 'uploadFile']);
 Route::get('/products/{product}', [ProductController::class, 'show']);
-Route::get('payment-success',[OrderController::class, 'paymentSuccess'])->name('payment.success');
+Route::get('payment-success/{is_singular}',[OrderController::class, 'paymentSuccess'])->name('payment.success');
 Route::post('webhooks/mollie',[OrderController::class, 'webhook'])->name('webhooks.mollie');
 
 Route::group(['middleware' => 'auth:api'], function(){

@@ -8,14 +8,13 @@
             <p class="p-text-secondary">Select a payment method to continue</p>
             <div class="p-fluid">
                 <div class="p-field">
-                    <!-- <InputText id="country" v-model="country" :class="{'p-invalid': validationErrors.selectedCity && submitted}" /> -->
                     <small v-show="validationErrors.selectedMethod && submitted" class="p-error">Country is required.</small>
-                    <ScrollPanel class="custom">
-                        <div v-for="paymentMethod in paymentMethods" :key="paymentMethod.name" class="p-field-radiobutton" :class="{'p-invalid': validationErrors.selectedMethod && submitted}">
-                            <RadioButton :id="paymentMethod.key" name="paymentMethod" :value="paymentMethod" v-model="selectedMethod" :disabled="paymentMethod.key === 'R'" />
-                            <label :for="paymentMethod.key">{{paymentMethod.name.toUpperCase()}}</label>
-                        </div>
-                    </ScrollPanel>
+                    <div class="form-check" v-for="paymentMethod in paymentMethods" :key="paymentMethod.name" :class="{'p-invalid': validationErrors.selectedMethod && submitted}">
+                        <input class="form-check-input" type="radio" :id="paymentMethod.key" name="paymentMethod" :value="paymentMethod" v-model="selectedMethod" :disabled="paymentMethod.key === 'R'" >
+                        <label class="form-check-label" :for="paymentMethod.key">
+                            {{paymentMethod.name.toUpperCase()}}
+                        </label>
+                    </div>
                     <small v-show="validationErrors.selectedMethod && submitted" class="p-error">Payment method is required.</small>
                 </div>
             </div>
@@ -32,6 +31,7 @@
 
 <script>
 export default {
+    props : ['formData'],
     data () {
         return {
             paymentMethods: [
@@ -57,6 +57,9 @@ export default {
         }
     },
     beforeMount() {
+        if( Object.entries(this.$props.formData).length === 0 ) {
+            this.$router.push({ path: '/' })
+        }
     },
     methods: {
         nextPage() {
