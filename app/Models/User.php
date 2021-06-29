@@ -50,4 +50,8 @@ class User extends Authenticatable
     public function address() {
         return $this->hasOne(Address::class);
     }
+
+    public function product_rating() {
+        return $this->hasMany(ProductRating::class);
+    }
 }

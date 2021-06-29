@@ -23,6 +23,7 @@ Route::post('login', [UserController::class, 'login']);
 Route::post('register', [UserController::class, 'register']);
 Route::get('/products', [ProductController::class, 'index']);
 Route::post('/upload-file', [ProductController::class, 'uploadFile']);
+Route::post('/add-review', [ProductController::class, 'addReview']);
 Route::get('/products/{product}', [ProductController::class, 'show']);
 Route::get('payment-success/{is_singular}',[OrderController::class, 'paymentSuccess'])->name('payment.success');
 Route::post('webhooks/mollie',[OrderController::class, 'webhook'])->name('webhooks.mollie');

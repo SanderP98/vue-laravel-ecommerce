@@ -12,6 +12,10 @@ class ProductRating extends Model
     protected $table = 'product_ratings';
     
     protected $fillable = [
-        'description', 'rating'
+        'product_id', 'user_id', 'rating', 'title', 'description'
     ];
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
 }

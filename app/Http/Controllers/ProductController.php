@@ -68,6 +68,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
+        $product = Product::with('product_rating', 'product_rating.user')->whereIn('id', $product)->get();
         return response()->json($product, 200);
     }
 
@@ -79,6 +80,20 @@ class ProductController extends Controller
         }
 
         return response()->json($name, 201);
+    }
+    public function addReview(Request $request) {
+        $status = ProductRating::create([
+            'product_id' => $request->product,
+            'user_id' => $request->user,
+            'rating' => $request->rating,
+            'title' => $request->title,
+            'description' => $request->description,
+        ]);
+
+        return response()->json([
+            'status' => $status,
+            'message' => $status ? 'Review submitted!' : 'Review not submitted!'
+        ]); 
     }
     /**
      * Show the form for editing the specified resource.
