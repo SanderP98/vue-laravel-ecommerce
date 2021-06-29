@@ -48,6 +48,7 @@ import Steps from 'primevue/steps'
 import RadioButton from 'primevue/radiobutton'
 import ScrollPanel from 'primevue/scrollpanel'
 import ProgressBar from 'primevue/progressbar'
+import Galleria from 'primevue/galleria'
 
 //Services
 Vue.use(PrimeVue)
@@ -85,6 +86,7 @@ Vue.use(Steps)
 Vue.use(RadioButton)
 Vue.use(ScrollPanel)
 Vue.use(ProgressBar)
+Vue.use(Galleria)
 
 Vue.component('Toast', Toast)
 Vue.component('MultiSelect', MultiSelect)
@@ -116,6 +118,7 @@ Vue.component('Steps', Steps)
 Vue.component('RadioButton', RadioButton)
 Vue.component('ScrollPanel', ScrollPanel)
 Vue.component('ProgressBar', ProgressBar)
+Vue.component('Galleria', Galleria)
 
 
 //Views

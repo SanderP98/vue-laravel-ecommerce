@@ -17,7 +17,7 @@
             <template #list="slotProps">
                 <div class="p-col-12" v-if="slotProps.data.units !== 0">
                     <div class="product-list-item">
-                        <img :src="'/images/' + slotProps.data.image" :alt="slotProps.data.name"/>
+                        <img :src="'/images/' + slotProps.data.product_image.image" :alt="slotProps.data.name"/>
                         <div class="product-list-detail">
                             <div class="product-name">{{slotProps.data.name}}</div>
                             <div class="product-description">{{slotProps.data.description}}</div>
@@ -37,7 +37,7 @@
                 <div class="p-col-12 p-md-4" v-if="slotProps.data.units !== 0">
                     <div class="product-grid-item card">
                         <div class="product-grid-item-content">
-                            <img :src="'/images/' + slotProps.data.image" :alt="slotProps.data.name"/>
+                            <img :src="'/products/' + slotProps.data.product_image[0].image" :alt="slotProps.data.name"/>
                             <div class="product-name">{{slotProps.data.name}}</div>
                             <div class="product-description">{{slotProps.data.description}}</div>
                             <Rating :value="slotProps.data.averageRating" :readonly="true" :cancel="false"></Rating>

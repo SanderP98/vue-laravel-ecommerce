@@ -21,7 +21,7 @@ class ProductController extends Controller
     public function index()
     {
         return response()->json([
-            'products' => Product::with('product_rating', 'product_category')->get(),
+            'products' => Product::with('product_rating', 'product_category', 'product_image')->get(),
             'categories' => ProductCategory::all()
         ]);
     }
@@ -50,6 +50,9 @@ class ProductController extends Controller
             'description' => $request->description,
             'units' => $request->units,
             'price' => $request->price,
+        ]);
+
+        $product->product_image()->create([
             'image' => $request->image,
         ]);
 
@@ -68,7 +71,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        $product = Product::with('product_rating', 'product_rating.user')->whereIn('id', $product)->get();
+        $product = Product::with('product_rating', 'product_rating.user', 'product_image')->whereIn('id', $product)->get();
         return response()->json($product, 200);
     }
 
@@ -76,7 +79,7 @@ class ProductController extends Controller
         
         if( $request->hasFile('image')) {
             $name = time()."_".$request->file('image')->getClientOriginalName();
-            $request->file('image')->move(public_path('images'), $name);
+            $request->file('image')->move(public_path('products'), $name);
         }
 
         return response()->json($name, 201);

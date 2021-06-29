@@ -31,13 +31,12 @@
                         </span>
                     </div>
                 </template>
-
                 <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
                 <Column field="name" header="Name" sortable></Column>
                 <Column field="description" header="Description" sortable></Column>
                 <Column header="Image">
                     <template #body="slotProps">
-                        <img :src="'/images/' + slotProps.data.image" :alt="slotProps.data.image" class="product-image" />
+                        <img :src="'/products/' + slotProps.data.product_image[0].image" :alt="slotProps.data.product_image[0].name" class="product-image" />
                     </template>
                 </Column>
                 <Column field="price" header="Price" sortable>
@@ -60,7 +59,7 @@
         </div>
 
         <Dialog :visible.sync="productDialog" :style="{width: '450px'}" header="Product Details" :modal="true" class="p-fluid">
-            <img :src="'/images/' + product.image" :alt="product.image" class="product-image mb-2" v-if="product.image" />
+            <img :src="'/products/' + product.product_image[0].image" :alt="product.product_image[0].name" class="product-image mb-2" v-if="product.product_image" />
             <div class="p-field">
                 <label for="name">Name</label>
                 <InputText id="name" v-model.trim="product.name" required="true" autofocus :class="{'p-invalid': submitted && !product.name}" />
@@ -76,7 +75,7 @@
             </div>
              <div class="p-field">
                 <label for="image">Image</label>
-                <FileUpload name="image" id="image" mode="basic" v-model="product.image" :chooseLabel="chooseLabel" required="true" accept="image/*" :auto="true" :customUpload="true" @uploader="attachFile" :loading="isSelecting" @click="selectedFile" />
+                <FileUpload name="image" id="image" mode="basic" v-model="product.image" :chooseLabel="chooseLabel" required="true" :multiple="true"  accept="image/*" :auto="true" :customUpload="true" @uploader="attachFile" :loading="isSelecting" @click="selectedFile" />
             </div>           
             <div class="p-form-grid p-grid">
                 <div class="p-field p-col">
@@ -145,10 +144,7 @@
             }
         },
         mounted() {
-            axios.get('/api/products/').then(response => {
-                this.products = response.data.products
-                this.categories = response.data.categories
-            });
+            this.getProducts();
         },
         methods : {
             formatCurrency(value) {
@@ -215,10 +211,9 @@
                                 let image = this.product.image
                                 this.$emit('close', this.product)
 
-                                axios.post("/api/products/", {category, name, units, price, description, image})
-                                .then(response => {
-                                    this.products.push(response.data.data);
-                                });
+                                axios.post("/api/products/", {category, name, units, price, description, image});
+
+                                this.getProducts();
 
                                 this.$toast.add({severity:'success', summary: 'Successful', detail: 'Product Created', life: 3000});
                             });
@@ -287,6 +282,12 @@
             }, 
                 { once: true })
             },
+            getProducts() {
+                axios.get('/api/products/').then(response => {
+                    this.products = response.data.products
+                    this.categories = response.data.categories
+                });
+            }
         },
     }
 </script>

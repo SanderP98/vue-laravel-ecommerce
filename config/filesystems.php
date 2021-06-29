@@ -58,6 +58,12 @@ return [
             'visibility' => 'public',
         ],
 
+        'products' => [
+            'driver' => 'local',
+            'root' => public_path('products'),
+            'visibility' => 'public',
+        ],
+
     ],
 
     /*
