@@ -49,6 +49,7 @@ import RadioButton from 'primevue/radiobutton'
 import ScrollPanel from 'primevue/scrollpanel'
 import ProgressBar from 'primevue/progressbar'
 import Galleria from 'primevue/galleria'
+import AutoComplete from 'primevue/autocomplete'
 
 //Services
 Vue.use(PrimeVue)
@@ -87,6 +88,7 @@ Vue.use(RadioButton)
 Vue.use(ScrollPanel)
 Vue.use(ProgressBar)
 Vue.use(Galleria)
+Vue.use(AutoComplete)
 
 Vue.component('Toast', Toast)
 Vue.component('MultiSelect', MultiSelect)
@@ -119,7 +121,7 @@ Vue.component('RadioButton', RadioButton)
 Vue.component('ScrollPanel', ScrollPanel)
 Vue.component('ProgressBar', ProgressBar)
 Vue.component('Galleria', Galleria)
-
+Vue.component('AutoComplete', AutoComplete)
 
 //Views
 import App from './views/App'

@@ -1,6 +1,98 @@
 <template>
     <div>
-        <nav class="navbar navbar-expand-md navbar-light navbar-laravel">
+        <nav class="navbar navbar-expand-lg navbar-light p-mb-3">
+            <div class="container-fluid">
+                <div class="col-lg-2">
+                    <button class="navbar-toggler" data-toggle="collapse" data-target=".dual-nav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="navbar-collapse collapse dual-nav w-25">
+                        <ul class="navbar-nav">
+                            <li class="nav-item active">
+                                <a href="/" class="navbar-brand mx-auto d-block w-25">Shop</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <div class="navbar-collapse dual-nav collapse nav-link">
+                        <ul class="navbar-nav mt-2 mt-lg-0 w-100 p-jc-center">
+                            <li class="nav-item p-pl-1 p-pr-1 w-25">
+                                <Dropdown v-model="selectedCategory" :options="categories" optionLabel="name" class="w-100" placeholder="Select a Category" />
+                            </li>             
+                            <li class="nav-item p-pl-1 p-pr-1 w-50">
+                                <AutoComplete v-model="selectedProduct" :suggestions="filteredProducts" @complete="searchProduct($event)" placeholder="Search for a Product">
+                                    <template #item="slotProps">
+                                        <img :alt="slotProps.item.product_image[0].name" :src="'/products/' + slotProps.item.product_image[0].image" width="50px" height="50px" />
+                                        <div>{{slotProps.item.name}}</div>
+                                    </template>
+                                </AutoComplete>
+                            </li>
+                            <li class="nav-item p-pl-1 p-pr-1 w-10">
+                                <Button label="Search" class="w-100"  />
+                            </li>
+                        </ul>                   
+                    </div>
+                </div>
+                <div class="col-lg-2 p-text-right navbar-collapse collapse dual-nav">
+                    <Button :disabled="totalItems == '0'" icon="pi pi-shopping-cart" id="body" class="p-button-raised p-button-rounded p-button-secondary ml-auto" :label="String(totalItems)" @click="showCart" />
+                    <OverlayPanel ref="op" appendTo="body" :showCloseIcon="true" id="overlay_panel" style="width: 550px">
+                        <DataTable :value="cartItems">
+                            <template #header>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span class="badge badge-primary badge-pill">{{totalItems}}</span>
+                                {{formatCurrency(totalPrice)}}
+                            </li>
+                            </template>
+                            <Column field="name">
+                                <template #body="slotProps">
+                                    {{slotProps.data.name}}
+                                </template>
+                            </Column>
+                            <Column>
+                                <template #body="slotProps">
+                                    <img :src="'/products/' + slotProps.data.image" :alt="slotProps.data.image" class="product-image" />
+                                </template>
+                            </Column>
+                            <Column field="price">
+                                <template #body="slotProps">
+                                    {{formatCurrency(slotProps.data.subtotal)}}
+                                </template>
+                            </Column>
+                            <Column field="quantity" class="cartArrows">
+                                <template #body="slotProps">
+                                    <div class="p-grid mt-0 p-0">
+                                        <div class="p-col-9 mt-0 mb-0">
+                                            <InputNumber v-model="slotProps.data.quantity" inputClass="amountItem" decrementButtonClass="decreaseAmount" incrementButtonClass="increaseAmount" showButtons @input="changeQuantityCartItem(slotProps.data)" />
+                                        </div>
+                                        <div class="p-col-3 mt-0 mb-0">
+                                            <Button v-model="slotProps.data.id" class="p-button-rounded p-button-danger deleteFromCartBtn p-col-6" icon="pi pi-times" @click="deleteItemFromCart(slotProps.data)" />
+                                        </div>
+                                    </div>
+                                </template>
+                            </Column>
+                        </DataTable>
+                        <router-link :to="{ name: 'cart' }" v-if="user_type == 0 || user_type == 1"><Button class="p-button-raised float-right m-2" @click="showCart()">Checkout</Button></router-link>
+                    </OverlayPanel>
+                </div>
+
+                <!-- <div class="collapse navbar-collapse dual-nav w-50" id="navbarSupportedContent"> 
+                    <ul class="navbar-nav mt-2 mt-lg-0">
+                        <li class="nav-item me-2">
+                            <Dropdown v-model="selectedCategory" :options="categories" optionLabel="name" placeholder="Select a Category" />
+                        </li>             
+                        <li class="nav-item">
+                            <AutoComplete v-model="selectedProduct" :suggestions="filteredProducts" @complete="searchProduct($event)" field="name" />
+                        </li>
+                        <li>
+                            <Button label="Search" />
+                        </li>
+                    </ul>
+                </div> -->
+            </div>
+        </nav>
+        
+        <!-- <nav class="navbar navbar-expand-md navbar-light navbar-laravel">
             <div class="container">
                 <router-link :to="{name: 'home'}" class="navbar-brand">vue-laravel-ecommerce</router-link>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,7 +110,7 @@
 
                     </ul>
                     <ul class="navbar-nav mr-auto">
-                        <li v-if="isLoggedIn" class="nav-link"><Button :disabled="totalItems == '0'" icon="pi pi-shopping-cart" id="body" class="p-button-raised p-button-rounded p-button-secondary" :label="String(totalItems)" @click="showCart" /></li> <!---->
+                        <li v-if="isLoggedIn" class="nav-link"><Button :disabled="totalItems == '0'" icon="pi pi-shopping-cart" id="body" class="p-button-raised p-button-rounded p-button-secondary" :label="String(totalItems)" @click="showCart" /></li>
                         <li class="nav-link" v-if="isLoggedIn" @click="logout"><Button v-if="isLoggedIn" icon="pi pi-sign-in" label="Log out" class="p-button-raised p-button-danger p-button-rounded"/></li>
                         <OverlayPanel ref="op" appendTo="body" :showCloseIcon="true" id="overlay_panel" style="width: 550px">
 
@@ -56,19 +148,19 @@
                                         </div>
                                     </template>
                                 </Column>
-                                <!-- <Column field="action">
+                                <Column field="action">
                                     <template #body="slotProps">
                                         <Button v-model="slotProps.data.id" class="p-button-rounded p-button-danger deleteFromCartBtn p-col-6" icon="pi pi-times" @click="removeFromCart(slotProps.data)" />
                                     </template>
-                                </Column> -->
+                                </Column>
                             </DataTable>
                             <router-link :to="{ name: 'cart' }" v-if="user_type == 0 || user_type == 1"><Button class="p-button-raised float-right m-2" @click="showCart()">Checkout</Button></router-link>
                         </OverlayPanel>
                     </ul>
                 </div>
             </div>
-        </nav>
-        <main class="py-4">
+        </nav> -->
+        <main class="py-0">
             <router-view @loggedIn="change"></router-view>
         </main>
     </div>
@@ -81,6 +173,11 @@
                 name : null,
                 user_type : 0,
                 cartItems: [],
+                products: [],
+                categories: [],
+                filteredProducts: null,
+                selectedProduct: null,
+                selectedCategory: null,
                 newCartItem: {
                     id: 0,
                     name: 0,
@@ -95,6 +192,12 @@
                 totalItemsString: '0',
                 isLoggedIn: localStorage.getItem('vue-laravel-ecommerce.jwt') != null
             }
+        },
+        beforeMount() {
+            axios.get("api/products/").then(response => {
+                this.products = response.data.products
+                this.categories = response.data.categories
+            })
         },
         mounted() {
             this.setDefaults()
@@ -152,7 +255,7 @@
                     this.newCartItem.name = product.name;
                     this.newCartItem.price = product.price;
                     this.newCartItem.quantity = product.quantity;
-                    this.newCartItem.image = product.image;
+                    this.newCartItem.image = product.product_image[0].image;
                     this.newCartItem.subtotal = product.price;
                     this.newCartItem.units = product.units;
                     this.cartItems.push(this.newCartItem);
@@ -195,11 +298,35 @@
                 this.totalPrice = 0;
                 this.totalItems = "0";
             },
+            searchProduct(event) {
+                setTimeout(() => {
+                    if (!event.query.trim().length) {
+                        this.filteredProducts = [...this.products];
+                    }
+                    else {
+                        this.filteredProducts = this.products.filter(product => {
+                            if ( this.selectedCategory ) {
+                                return product.name.toLowerCase().startsWith(event.query.toLowerCase()) && product.category_id == this.selectedCategory.id;
+                            } else {
+                                return product.name.toLowerCase().startsWith(event.query.toLowerCase())
+                            }
+                        });
+                    }
+                }, 250);
+            }
         },
     }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+::v-deep .p-autocomplete, ::v-deep .p-autocomplete > input {
+    width:100%!important;
+}
+.navbar {
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+</style>
+<style>
 .product-image {
     width: 50px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)

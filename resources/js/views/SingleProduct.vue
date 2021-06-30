@@ -214,7 +214,7 @@
                 if (!rating) {
                     this.errors.push("Rating required.");
                 }
-                if(!/^[A-Za-z]+$/.test(title)) {
+                if(!/[A-Za-z]+$/.test(title)) {
                     this.errors.push('Title is empty or contains numeric values.');
                 } 
                 if (!description) {
