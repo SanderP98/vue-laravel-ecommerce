@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\ProductRating;
 use App\Models\OrderDetails;
 use App\Models\ProductCategory;
+use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
@@ -118,17 +119,21 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        $oldImage = Product::find($product->id);
-
-        if(Storage::disk('images')->exists($oldImage->image)){
-            if($oldImage->image != $request->get('image')) {
-                Storage::disk('images')->delete($oldImage->image);
+        $oldImage = ProductImage::where('product_id', $product->id)->value('image');
+        Log::info($oldImage);
+        Log::info($request->get('image'));
+        if(Storage::disk('products')->exists($oldImage)){
+            if($oldImage !== $request->get('image')) {
+                Storage::disk('products')->delete($oldImage);
             }
         }
 
         $status = $product->update(
-            $request->only([ 'name', 'description', 'units', 'price', 'image' ])
+            $request->only([ 'name', 'description', 'units', 'price' ])
         );
+        $product->product_image()->update([
+            'image' => $request->image
+        ]);
         // Log::info($request->get('image'));
         return response()->json([
             'status' => $status,
@@ -168,8 +173,10 @@ class ProductController extends Controller
             if( isset($waitingToBeShipped) && $waitingToBeShipped->count() ) {
                 $status .= '#'.$id . ', ';
             } else {
-                // $image = Product::find($id)->value('image');
-                // Storage::disk('images')->delete($image);
+                $images = ProductImage::where('product_id', $id)->get();
+                foreach($images as $image) {
+                    Storage::disk('products')->delete($image->image);
+                }
                 Product::find($id)->delete();
                 //check if this product has associated orders and order_details
                 if ( is_int($innerJoin) ) {
@@ -188,27 +195,47 @@ class ProductController extends Controller
 
         return response()->json([
             'status' => $status,
-            'message' => !$status ? 'Products deleted' : $status ? : 'Products could not be deleted.'
+            'message' => !$status ? 'Products deleted' : 'Products could not be deleted.'
         ]);
     }
 
     public function destroy(Product $product)
     {
         $status = false;
+        $id = $product->id;
+        $waitingToBeShipped=null;
+        $innerJoin = OrderDetails::where('product_id', $id)->value('order_id');
+        if ( is_int($innerJoin) ) {
+            $waitingToBeShipped = Order::where('is_delivered', 0)
+            ->join('order_details', 'orders.id', '=', 'order_details.order_id')
+            ->where('order_details.order_id', $innerJoin)
+            ->get();
+        } 
 
-        $waitingToBeShipped = Order::where('product_id', $product->id)
-                                   ->where('is_delivered', 0)
-                                   ->get();
+        if( isset($waitingToBeShipped) && $waitingToBeShipped->count() ) {
+            $status = 'Product could not be deleted.';
+        } else {
+            $images = ProductImage::where('product_id', $id)->get();
+            foreach($images as $image) {
+                Storage::disk('products')->delete($image->image);
+            }
+            Product::find($id)->delete();
+            //check if this product has associated orders and order_details
+            if ( is_int($innerJoin) ) {
+                $order_details = OrderDetails::where('product_id', $id)->delete();
+                $order = Order::join('order_details', 'orders.id', '=', 'order_details.order_id')
+                ->where('order_details.order_id', $innerJoin)->delete();
+            }
+        }
 
-        if(!$waitingToBeShipped->count()) {
-            $status = $product->delete();
-            $product->orders()->delete();
-            Storage::disk('images')->delete($product->image);
+        if ( strlen($status) ) {
+            $status = rtrim($status, ', ');
+            $status = 'Make sure to deliver the pending orders first.';
         }
 
         return response()->json([
             'status' => $status,
-            'message' => $status ? 'Product deleted' : 'Make sure to handle the open orders from that product first'
+            'message' => $status ? $status : 'Product has been deleted successfully.'
         ]);
 
     }

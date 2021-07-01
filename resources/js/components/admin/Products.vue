@@ -192,7 +192,7 @@
                         
                         axios.put(`/api/products/${this.product.id}`, {category, name, units, price, description, image})
                         .then(response => {
-                            axios.get('/api/products/').then(response => this.products = response.data)
+                            axios.get('/api/products/').then(response => this.products = response.data.products)
                             this.$toast.add({severity:'success', summary: 'Successful', detail: 'Product Updated', life: 3000});
                         });
                     } else {
@@ -240,10 +240,13 @@
                     if(response.data.status) {
                         this.products = this.products.filter(val => val.id !== this.product.id);
                         this.deleteProductDialog = false;
-                        this.$toast.add({severity:'success', summary: 'Success Message', detail: response.data.message, life: 3000});
+                        this.$toast.add({severity:'success', summary: 'Warning Message', detail: response.data.message, life: 3000});
                         this.product = {};
                     } else {
-                        this.$toast.add({severity:'warn', summary: 'Warning Message', detail: response.data.message, life: 3000});
+                        this.products = this.products.filter(val => val.id !== this.product.id);
+                        this.deleteProductDialog = false;
+                        this.$toast.add({severity:'success', summary: 'Success Message', detail: response.data.message, life: 3000});
+                        this.product = {};
                     }
                 });
             },
