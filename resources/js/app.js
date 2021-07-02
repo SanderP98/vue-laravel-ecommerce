@@ -137,6 +137,9 @@ import Confirmation from './views/Confirmation'
 import UserBoard from './views/UserBoard'
 import Admin from './views/Admin'
 import Cart from './views/Cart'
+import WelcomePage from './components/admin/setup/WelcomePage'
+import ShopInformation from './components/admin/setup/ShopInformation'
+import PaymentSetup from './components/admin/setup/PaymentSetup'
 
 const router = new VueRouter({
     mode: 'history',
@@ -232,10 +235,26 @@ const router = new VueRouter({
             path: '/admin/:page',
             name: 'admin-pages',
             component: Admin,
+            children: [
+                {
+                    name: 'shop-wizard',              
+                    path: 'welcome',
+                    component: WelcomePage,
+                },
+                {           
+                    path: 'shop-information',
+                    component: ShopInformation,
+                },
+                {          
+                    path: 'payment-setup',
+                    component: PaymentSetup,
+                },
+            ],
             meta: {
                 requiresAuth: true,
                 is_admin: true
-            }
+            },
+            props: true
         },
         {
             path: '/admin',

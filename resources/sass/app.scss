@@ -10,3 +10,38 @@
 @import '~primeicons/primeicons.css';
 @import '~primeflex/primeflex.css';
 @import '~bootstrap/scss/bootstrap';
+
+@import "~@fortawesome/fontawesome-free/scss/fontawesome";
+@import "~@fortawesome/fontawesome-free/scss/regular";
+@import "~@fortawesome/fontawesome-free/scss/solid";
+@import "~@fortawesome/fontawesome-free/scss/brands";
+
+
+$shopping-cart-red: #495057;
+
+.fa-stack[data-count]:after{
+  position:absolute;
+  right:0.7em;
+  margin-left:auto;
+  top:0.3em;
+  content: attr(data-count);
+  font-size:40%;
+  padding:0.4em;
+  border-radius:999px;
+  line-height:.75em;
+  color: #f8f9fa;
+  color:$shopping-cart-red;
+  text-align:center;
+  min-width:2em;
+  font-weight:bold;
+  border:solid;
+  background: #f8f9fa;
+}
+.fa-circle {
+  color:#495057;
+}
+
+.red-cart {
+	color: #495057; background:#f8f9fa;
+    //margin-top:-1px;
+}

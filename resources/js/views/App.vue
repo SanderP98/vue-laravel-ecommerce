@@ -1,5 +1,33 @@
 <template>
     <div>
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container-fluid">
+                <div class="col-lg-6">
+                    <div class="navbar-collapse dual-nav collapse">
+                        <ul class="navbar-nav telAndMail mt-2 mt-lg-0 w-100 p-jc-start">
+                            <li class="nav-item p-pr-1">
+                                <i class="pi pi-phone nav-link"><span class="p-component p-ml-2">{{shopInfo.tel_nr}}</span></i>
+                            </li>             
+                            <li class="nav-item p-pl-1 p-pr-1">
+                                <i class="pi pi-envelope nav-link p-pr-1"><span class="p-component p-ml-2">{{shopInfo.email}}</span></i>
+                            </li>
+                        </ul>                   
+                    </div>
+                </div>
+                <div class="col-lg-6 p-text-right navbar-collapse collapse dual-nav">
+                    <ul class="navbar-nav mt-2 mt-lg-0 w-100 p-jc-end">
+                        <li class="nav-item p-pr-1 p-pl-0">
+                            <span class="p-component">Our showroom</span>
+                        </li>
+                        <li class="nav-item p-pl-1 p-pr-1">
+                            <span class="p-component">Helpdesk</span>
+                        </li>
+                    </ul>
+
+
+                </div>
+            </div>
+        </nav>
         <nav class="navbar navbar-expand-lg navbar-light p-mb-3">
             <div class="container-fluid">
                 <div class="col-lg-2">
@@ -9,7 +37,7 @@
                     <div class="navbar-collapse collapse dual-nav w-25">
                         <ul class="navbar-nav">
                             <li class="nav-item active">
-                                <a href="/" class="navbar-brand mx-auto d-block w-25">Shop</a>
+                                <router-link :to="{ name: 'home' }"><img v-if="shopInfo" class="navbar-brand mx-auto d-block w-100" :src="'/shop/' + shopInfo.image"/></router-link>
                             </li>
                         </ul>
                     </div>
@@ -35,7 +63,16 @@
                     </div>
                 </div>
                 <div class="col-lg-2 p-text-right navbar-collapse collapse dual-nav">
-                    <Button :disabled="totalItems == '0'" icon="pi pi-shopping-cart" id="body" class="p-button-raised p-button-rounded p-button-secondary ml-auto" :label="String(totalItems)" @click="showCart" />
+                    <ul class="navbar-nav mt-2 mt-lg-0 w-100 p-jc-end">
+                        <li>
+                            <span class="fa-stack fa-2x has-badge" :data-count="totalItems" @click="showCart" >
+                                <i class="fa fa-circle fa-stack-1x fa-inverse"></i>
+                                <i style="" class="fa fa-shopping-cart fa-stack-1x red-cart"></i>
+                            </span>
+                        </li>
+                    </ul>
+                    <!-- <div><li class="nav-link" v-if="isLoggedIn" @click="logout"><Button v-if="isLoggedIn" icon="pi pi-sign-in" label="Log out" class="p-button-raised p-button-danger p-button-rounded"/></li></div>
+                    <Button :disabled="totalItems == '0'" icon="pi pi-shopping-cart" id="body" class="p-button-raised p-button-rounded p-button-secondary ml-auto" :label="String(totalItems)" @click="showCart" /> -->
                     <OverlayPanel ref="op" appendTo="body" :showCloseIcon="true" id="overlay_panel" style="width: 550px">
                         <DataTable :value="cartItems">
                             <template #header>
@@ -72,6 +109,7 @@
                                 </template>
                             </Column>
                         </DataTable>
+
                         <router-link :to="{ name: 'cart' }" v-if="user_type == 0 || user_type == 1"><Button class="p-button-raised float-right m-2" @click="showCart()">Checkout</Button></router-link>
                     </OverlayPanel>
                 </div>
@@ -172,6 +210,7 @@
             return {
                 name : null,
                 user_type : 0,
+                shopInfo: [],
                 cartItems: [],
                 products: [],
                 categories: [],
@@ -197,6 +236,10 @@
             axios.get("api/products/").then(response => {
                 this.products = response.data.products
                 this.categories = response.data.categories
+            })
+            axios.get('/api/shop').then( response => {
+                this.shopInfo = response.data[0] 
+                console.log(response.data)
             })
         },
         mounted() {
@@ -322,10 +365,21 @@
 ::v-deep .p-autocomplete, ::v-deep .p-autocomplete > input {
     width:100%!important;
 }
-.navbar {
+.navbar:nth-child(2) {
     box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
 }
+::v-deep .p-overlaypanel::after, .p-overlaypanel:before {
+ background:none !important;
+ border:none !important;
+}
+::v-deep .p-datatable-thead {
+    display:none;
+}
+::v-deep .p-overlaypanel-close {
+    z-index:1;
+}
 </style>
+
 <style>
 .product-image {
     width: 50px;
@@ -339,5 +393,11 @@
 }
 .cartArrows {
     padding-left:0;
+}
+.telAndMail {
+    pointer-events:none;
+}
+.fa-shopping-cart:hover {
+    cursor: pointer;
 }
 </style>

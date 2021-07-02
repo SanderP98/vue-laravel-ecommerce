@@ -8,9 +8,10 @@
                 <div class="col-lg-2">
                     <ul style="list-style-type:none" class="mx-auto d-table">
                         <li class="active"><button class="btn" @click="setComponent('main')">Dashboard</button></li>
-                        <li><button class="btn" @click="setComponent('orders')">Orders</button></li>
-                        <li><button class="btn" @click="setComponent('products')">Products</button></li>
-                        <li><button class="btn" @click="setComponent('users')">Users</button></li>
+                        <li><button v-if="configCompleted" class="btn" @click="setComponent('orders')">Orders</button></li>
+                        <li><button v-if="configCompleted" class="btn" @click="setComponent('products')">Products</button></li>
+                        <li><button v-if="configCompleted" class="btn" @click="setComponent('users')">Users</button></li>
+                        <li><button v-if="!configCompleted" class="btn" @click="setComponent('setup')">Setup</button></li>
                     </ul>
                 </div>
                 <div class="col-lg-8">
@@ -26,22 +27,28 @@
     import Users from '../components/admin/Users'
     import Products from '../components/admin/Products'
     import Orders from '../components/admin/Orders'
-
+    import Setup from '../components/admin/Setup'
     export default {
         data () {
             return {
                 user: null,
-                activeComponent: null
+                activeComponent: null,
+                configCompleted: false,
             }
         },
         components: {
-            Main, Users, Products, Orders
+            Main, Users, Products, Orders, Setup
         },
         beforeMount() {
             this.setComponent(this.$route.params.page)
             this.user = JSON.parse(localStorage.getItem('vue-laravel-ecommerce. d fuser'))
             axios.defaults.headers.common['Content-Type'] = 'application/json'
             axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('vue-laravel-ecommerce.jwt')
+            axios.get('/api/shop').then( response => {
+                if ( response.data.length ) {
+                    this.configCompleted = true
+                }
+            });
         },
         methods: {
             setComponent(value) {
@@ -58,6 +65,10 @@
                         this.activeComponent = Products
                         this.$router.push({ name: 'admin-pages', params: {page: 'products' }}).catch(() => {});
                         break; 
+                    case "setup":
+                        this.activeComponent = Setup
+                        this.$router.push({ name: 'shop-wizard', params: {page: 'setup' }}).catch(() => {});
+                        break;
                     default: 
                         this.activeComponent = Main
                         this.$router.push({name: 'admin'}).catch(() => {});

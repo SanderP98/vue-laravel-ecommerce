@@ -1,6 +1,5 @@
 <template>
 <div>
-
     <Card>
         <template #content>
         <div class="container">
@@ -39,7 +38,7 @@
                     <small v-show="validationErrors.selectedMethod && submitted" class="p-error">Payment method is required.</small>
                 </div>
             </div>
-        </template> --> -->
+        </template> -->
         <template #footer>
             <div class="p-grid p-nogutter p-justify-between">
                 <Button label="Back" @click="prevPage()" icon="pi pi-angle-left" />

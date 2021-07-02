@@ -64,6 +64,12 @@ return [
             'visibility' => 'public',
         ],
 
+        'shop' => [
+            'driver' => 'local',
+            'root' => public_path('shop'),
+            'visibility' => 'public',
+        ],
+
     ],
 
     /*

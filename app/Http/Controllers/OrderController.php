@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\OrderDetails;
 use App\Models\Address;
 use App\Models\Product;
+use App\Models\PaymentMethod;
 use Auth;
 use Session;
 use Illuminate\Support\Facades\Mail;
@@ -30,6 +31,13 @@ class OrderController extends Controller
         return response()->json(Order::with('order_details', 'order_details.product', 'address', 'user')->get(), 200);
     }
 
+    public function getPaymentMethods($bool) {
+        if ( !$bool ) {
+            return response()->json(PaymentMethod::get(), 200);
+        } else {
+            return response()->json(PaymentMethod::where('is_active', $bool)->get(), 200);
+        }
+    }
     public function deliverOrder(Order $order) {
         $order->is_delivered = true;
         $status = $order->save();

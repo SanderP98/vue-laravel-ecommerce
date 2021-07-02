@@ -6,6 +6,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\ShopController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,13 +23,15 @@ use App\Http\Controllers\AddressController;
 Route::post('login', [UserController::class, 'login']);
 Route::post('register', [UserController::class, 'register']);
 Route::get('/products', [ProductController::class, 'index']);
-Route::post('/upload-file', [ProductController::class, 'uploadFile']);
-Route::post('/add-review', [ProductController::class, 'addReview']);
+Route::get('/shop', [ShopController::class, 'index']);
 Route::get('/products/{product}', [ProductController::class, 'show']);
-Route::get('payment-success/{is_singular}',[OrderController::class, 'paymentSuccess'])->name('payment.success');
 Route::post('webhooks/mollie',[OrderController::class, 'webhook'])->name('webhooks.mollie');
 
 Route::group(['middleware' => 'auth:api'], function(){
+    Route::get('payment-methods/{bool}',[OrderController::class, 'getPaymentMethods']);
+    Route::get('payment-success/{is_singular}',[OrderController::class, 'paymentSuccess'])->name('payment.success');
+    Route::post('/upload-file', [ProductController::class, 'uploadFile']);
+    Route::post('/add-review', [ProductController::class, 'addReview']);
     Route::post('molliepayment', [OrderController::class, 'preparePayment'])->name('molliepayment');
     Route::get('/users',[UserController::class, 'index']);
     Route::get('users/{user}',[UserController::class, 'show']);
@@ -42,6 +45,8 @@ Route::group(['middleware' => 'auth:api'], function(){
     Route::delete('products/{product}/delete', [ProductController::class, 'destroy']);
     Route::delete('orders/{order}/delete', [OrderController::class, 'destroy']);
     Route::resource('/orders', OrderController::class);
+    Route::resource('/shop', ShopController::class)->except(['index']);
+    Route::post('upload/shop-logo', [ShopController::class, 'uploadFile']);
     Route::resource('/address', AddressController::class)->except(['index','show']);
     Route::resource('/products', ProductController::class)->except(['index','show']);
 });
