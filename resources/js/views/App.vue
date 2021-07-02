@@ -37,7 +37,7 @@
                     <div class="navbar-collapse collapse dual-nav w-25">
                         <ul class="navbar-nav">
                             <li class="nav-item active">
-                                <router-link :to="{ name: 'home' }"><img v-if="shopInfo" class="navbar-brand mx-auto d-block w-100" :src="'/shop/' + shopInfo.image"/></router-link>
+                                <router-link :to="{ name: 'home' }"><img v-if="shopInfo" class="navbar-brand mx-auto d-block w-75" :src="'/shop/' + shopInfo.image"/></router-link>
                             </li>
                         </ul>
                     </div>
@@ -366,7 +366,7 @@
     width:100%!important;
 }
 .navbar:nth-child(2) {
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+    box-shadow: rgb(30 50 93 / 25%) 0px 0px 5px -1px, rgb(0 0 0 / 30%) 0px 1px 3px -1px;
 }
 ::v-deep .p-overlaypanel::after, .p-overlaypanel:before {
  background:none !important;
