@@ -14,6 +14,7 @@ class CreateShopSettingsTable extends Migration
     public function up()
     {
         Schema::create('shop_settings', function (Blueprint $table) {
+            $table->id();
             $table->string('name');
             $table->string('image');
             $table->string('email');

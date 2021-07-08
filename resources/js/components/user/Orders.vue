@@ -60,7 +60,7 @@
                     <template #content>
                         <AvatarGroup class="p-mb-3" v-if="selectedOrder.order_details">
                             <div class="order-box" v-for="(order_details, index) in selectedOrder.order_details.slice(0,4)" :key="index">
-                                <Avatar :image="'/images/'+order_details.product.image" size="xlarge"/>
+                                <Avatar :image="'/products/'+order_details.product.product_image[0].image" size="xlarge"/>
                             </div>
                             <Avatar v-if="selectedOrder.order_details.length > 4" shape="circle" size="xlarge" :label="stringify(selectedOrder.order_details.length - 4)" style="background-color:#9c27b0; color: #ffffff" />
                         </AvatarGroup>

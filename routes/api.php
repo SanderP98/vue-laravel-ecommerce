@@ -26,10 +26,10 @@ Route::get('/products', [ProductController::class, 'index']);
 Route::get('/shop', [ShopController::class, 'index']);
 Route::get('/products/{product}', [ProductController::class, 'show']);
 Route::post('webhooks/mollie',[OrderController::class, 'webhook'])->name('webhooks.mollie');
+Route::get('payment-methods/{bool}',[OrderController::class, 'getPaymentMethods']);
+Route::get('payment-success/{is_singular}',[OrderController::class, 'paymentSuccess'])->name('payment.success');
 
 Route::group(['middleware' => 'auth:api'], function(){
-    Route::get('payment-methods/{bool}',[OrderController::class, 'getPaymentMethods']);
-    Route::get('payment-success/{is_singular}',[OrderController::class, 'paymentSuccess'])->name('payment.success');
     Route::post('/upload-file', [ProductController::class, 'uploadFile']);
     Route::post('/add-review', [ProductController::class, 'addReview']);
     Route::post('molliepayment', [OrderController::class, 'preparePayment'])->name('molliepayment');

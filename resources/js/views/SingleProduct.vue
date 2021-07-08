@@ -222,6 +222,8 @@
                 }
 
                 if (!this.errors.length) {
+                    axios.defaults.headers.common['Content-Type'] = 'application/json'
+                    axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('vue-laravel-ecommerce.jwt')
                     axios.post(`/api/add-review/`, { product, user, rating, title, description }).then(response => {
                     this.$toast.add({severity:'success', summary: 'Successful', detail: response.data.message, life: 3000});
                     this.getReviews();

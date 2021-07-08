@@ -1,6 +1,6 @@
 <template>
     <div>
-        <nav class="navbar navbar-expand-lg navbar-light">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white" v-if="shopInfo">
             <div class="container-fluid">
                 <div class="col-lg-6">
                     <div class="navbar-collapse dual-nav collapse">
@@ -23,12 +23,10 @@
                             <span class="p-component">Helpdesk</span>
                         </li>
                     </ul>
-
-
                 </div>
             </div>
         </nav>
-        <nav class="navbar navbar-expand-lg navbar-light p-mb-3">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white p-mb-3">
             <div class="container-fluid">
                 <div class="col-lg-2">
                     <button class="navbar-toggler" data-toggle="collapse" data-target=".dual-nav">
@@ -37,7 +35,7 @@
                     <div class="navbar-collapse collapse dual-nav w-25">
                         <ul class="navbar-nav">
                             <li class="nav-item active">
-                                <router-link :to="{ name: 'home' }"><img v-if="shopInfo" class="navbar-brand mx-auto d-block w-75" :src="'/shop/' + shopInfo.image"/></router-link>
+                                <router-link :to="{ name: 'home' }"><img v-if="shopInfo" class="navbar-brand mx-auto d-block w-75" :src="'/shop/' + shopInfo.image" :alt="shopInfo.name" /></router-link>
                             </li>
                         </ul>
                     </div>
@@ -64,17 +62,20 @@
                 </div>
                 <div class="col-lg-2 p-text-right navbar-collapse collapse dual-nav">
                     <ul class="navbar-nav mt-2 mt-lg-0 w-100 p-jc-end">
-                        <li>
+                        <li class="nav-item">
                             <span class="fa-stack fa-2x has-badge" :data-count="totalItems" @click="showCart" >
                                 <i class="fa fa-circle fa-stack-1x fa-inverse"></i>
                                 <i style="" class="fa fa-shopping-cart fa-stack-1x red-cart"></i>
                             </span>
                         </li>
+                        <li class="nav-link" v-if="isLoggedIn" @click="logout">
+                            <Button v-if="isLoggedIn" icon="pi pi-sign-in" label="Log out" class="p-button-raised p-button-danger p-button-rounded"/>
+                        </li>
                     </ul>
                     <!-- <div><li class="nav-link" v-if="isLoggedIn" @click="logout"><Button v-if="isLoggedIn" icon="pi pi-sign-in" label="Log out" class="p-button-raised p-button-danger p-button-rounded"/></li></div>
                     <Button :disabled="totalItems == '0'" icon="pi pi-shopping-cart" id="body" class="p-button-raised p-button-rounded p-button-secondary ml-auto" :label="String(totalItems)" @click="showCart" /> -->
                     <OverlayPanel ref="op" appendTo="body" :showCloseIcon="true" id="overlay_panel" style="width: 550px">
-                        <DataTable :value="cartItems">
+                        <DataTable :value="cart">
                             <template #header>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <span class="badge badge-primary badge-pill">{{totalItems}}</span>
@@ -100,10 +101,10 @@
                                 <template #body="slotProps">
                                     <div class="p-grid mt-0 p-0">
                                         <div class="p-col-9 mt-0 mb-0">
-                                            <InputNumber v-model="slotProps.data.quantity" inputClass="amountItem" decrementButtonClass="decreaseAmount" incrementButtonClass="increaseAmount" showButtons @input="changeQuantityCartItem(slotProps.data)" />
+                                            <InputNumber v-model="slotProps.data.quantity" inputClass="amountItem" decrementButtonClass="decreaseAmount" incrementButtonClass="increaseAmount" showButtons @input="changeQuantityItem(slotProps.data)" />
                                         </div>
                                         <div class="p-col-3 mt-0 mb-0">
-                                            <Button v-model="slotProps.data.id" class="p-button-rounded p-button-danger deleteFromCartBtn p-col-6" icon="pi pi-times" @click="deleteItemFromCart(slotProps.data)" />
+                                            <Button v-model="slotProps.data.id" class="p-button-rounded p-button-danger deleteFromCartBtn p-col-6" icon="pi pi-times" @click="removeFromCart(slotProps.data)" />
                                         </div>
                                     </div>
                                 </template>
@@ -199,6 +200,8 @@
             </div>
         </nav> -->
         <main class="py-0">
+   <!-- {{error}}          -->
+            <Toast position="top-right">{{error}}</Toast>
             <router-view @loggedIn="change"></router-view>
         </main>
     </div>
@@ -225,11 +228,26 @@
                     image: '',
                     units: 0,
                 },
-                totalPrice: 0,
-                quantity: 0,
-                totalItems: 0,
                 totalItemsString: '0',
                 isLoggedIn: localStorage.getItem('vue-laravel-ecommerce.jwt') != null
+            }
+        },
+        computed : {
+            cart() {
+                return this.$store.state.cart
+            },
+            totalItems() {
+                return this.$store.state.totalItems
+            },
+            totalPrice() {
+                return this.$store.state.totalPrice
+            },
+            error: function() {
+                if (this.$store.state.error !== null ) {
+                    this.$toast.add({severity:'warn', summary: 'Warn Message', detail:this.$store.state.error, life: 3000});
+                    this.$store.commit('clearError')
+                }
+                return this.$store.state.error
             }
         },
         beforeMount() {
@@ -239,25 +257,17 @@
             })
             axios.get('/api/shop').then( response => {
                 this.shopInfo = response.data[0] 
-                console.log(response.data)
             })
+            this.$store.commit('totalItems');
+            this.$store.commit('totalPrice');
         },
         mounted() {
             this.setDefaults()
-            if (localStorage.getItem('vue-laravel-ecommerce.shopCart')) {
-                this.cartItems = Object.values(JSON.parse(localStorage.getItem('vue-laravel-ecommerce.shopCart')));
-                this.totalItems = String(this.cartItems.reduce((total, item)=> {
-                    return total + item.quantity;
-                }, 0));
-                this.totalPrice = this.cartItems.reduce((total, item)=> {
-                    return total + item.subtotal;
-                }, 0);
-            }
-        },
-        created() {
-            this.$on('emptyCart', this.emptyCart)
-            this.$on('addToCart', this.addToCart)
-            this.$on('changeQuantityCartItem', this.changeQuantityCartItem)
+            this.$on("updateNav", function() {
+                axios.get('/api/shop').then( response => {
+                    this.shopInfo = response.data[0] 
+                })                   
+            });
         },
         methods : {
             formatCurrency(value) {
@@ -287,59 +297,15 @@
             showCart(event) {
                 this.$refs.op.toggle(event);
             },
-            addToCart(product) {
-                console.log()
-                let findProduct = this.cartItems.find(o => o.id === product.id)
-                if(findProduct){
-                    findProduct.quantity +=1;
-                    findProduct.subtotal = findProduct.quantity * findProduct.price;
-                } else {
-                    this.newCartItem.id = product.id
-                    this.newCartItem.name = product.name;
-                    this.newCartItem.price = product.price;
-                    this.newCartItem.quantity = product.quantity;
-                    this.newCartItem.image = product.product_image[0].image;
-                    this.newCartItem.subtotal = product.price;
-                    this.newCartItem.units = product.units;
-                    this.cartItems.push(this.newCartItem);
-                    this.newCartItem = {}
-                }
-                this.storeToCart();
+            changeQuantityItem ( product ) {
+                this.$store.commit('changeQuantityItem', product)
+                this.$store.commit('totalItems');
+                this.$store.commit('totalPrice');    
             },
-            storeToCart() {
-                this.totalItems = this.cartItems.reduce((total, item)=> {
-                    return total + parseInt(item.quantity);
-                }, 0);
-                this.totalPrice = this.cartItems.reduce((total, item)=> {
-                    return total + item.subtotal;
-                }, 0);
-                let parsed = JSON.stringify(this.cartItems);
-                localStorage.setItem('vue-laravel-ecommerce.shopCart', parsed)
-            },
-            changeQuantityCartItem(product) {
-                let findProduct = this.cartItems.find(o => o.id === product.id)
-                if (findProduct) {
-                    if ( product.quantity > product.units ) {
-                        product.quantity = product.units
-                    } else {
-                        findProduct.quantity = product.quantity;
-                    }
-                    findProduct.subtotal = product.quantity * findProduct.price;
-                }    
-                this.storeToCart();           
-            },
-            deleteItemFromCart(product) {
-                let findProduct = this.cartItems.find(o => o.id === product.id)
-                if (findProduct) {
-                    this.cartItems.pop(this.findProduct);
-                }   
-                this.storeToCart();                      
-            },
-            emptyCart() {
-                localStorage.removeItem('vue-laravel-ecommerce.shopCart');
-                this.cartItems = [];
-                this.totalPrice = 0;
-                this.totalItems = "0";
+            removeFromCart ( product ) {  
+                this.$store.commit('removeFromCart', product);       
+                this.$store.commit('totalItems');
+                this.$store.commit('totalPrice');         
             },
             searchProduct(event) {
                 setTimeout(() => {
@@ -356,7 +322,7 @@
                         });
                     }
                 }, 250);
-            }
+            },
         },
     }
 </script>

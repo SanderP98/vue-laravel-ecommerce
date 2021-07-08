@@ -41,7 +41,7 @@
                 </div>
 
                 <keep-alive>
-                    <router-view :formData="formObject" :pid="this.products" @prevPage="prevPage($event)" @nextPage="nextPage($event)" @complete="complete" />
+                    <router-view :formData="formObject" :pid="this.cart" @prevPage="prevPage($event)" @nextPage="nextPage($event)" @complete="complete" />
                 </keep-alive>
             </div>
         </div>
@@ -90,11 +90,13 @@
                     image: '',
                     units: 0,
                 },
-                products: [],
+                cart: [],
             }
         },
-        created() {
-
+        computed : {
+            products: function() {
+                return this.$store.state.cart
+            }
         },
         mounted() {
             this.isLoggedIn = localStorage.getItem('vue-laravel-ecommerce.jwt') != null
@@ -106,19 +108,18 @@
             if ( this.$route.params.pid ) {
                 this.singleProduct = true;
                 axios.get(`/api/products/${this.pid}`).then(response => {
-                    this.product.id = response.data.id
-                    this.product.name = response.data.name
-                    this.product.units = response.data.units
-                    this.product.image = response.data.image
-                    this.product.price = response.data.price
-                    this.product.quantity = this.$route.params.quantity
-                    this.products.push(this.product);
-                    this.product = []
+                    this.product.id = response.data[0].id
+                    this.product.name = response.data[0].name
+                    this.product.units = response.data[0].units
+                    this.product.image = response.data[0].product_image[0].image
+                    this.product.price = response.data[0].price
+                    this.product.quantity = 1
+                    this.cart.push(this.product);
+                    this.product = {}
                 });
+            } else {
+                this.cart = this.$store.state.cart
             }
-            // } else {
-            //     this.products = JSON.parse(localStorage.getItem('vue-laravel-ecommerce.shopCart')); 
-            // }
 
             if ( localStorage.getItem('vue-laravel-ecommerce.jwt' ) != null ) {
                 this.user = JSON.parse(localStorage.getItem('vue-laravel-ecommerce.user'))
@@ -189,11 +190,7 @@
                     //update
                     axios.put(`/api/address/${address_id}`, { user, country, address, address_2, city, state, postal_code }); 
                 }
-                if ( this.singleProduct == true ) {
-                    var products = this.products
-                } else {
-                    var products = JSON.parse(localStorage.getItem('vue-laravel-ecommerce.shopCart'))        
-                }
+                var products = this.cart
                 let totalPrice = products.reduce((total, item)=> {
                     return total + item.quantity * item.price;
                 }, 0);

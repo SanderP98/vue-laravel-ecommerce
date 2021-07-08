@@ -3,8 +3,9 @@
     <div class="container">
         <div class="row">
             <div class="col-md-8 offset-md-2">
-                <div class="order-box" v-for="(product, index) in products" :key="index">
-                    <img :src="'/images/'+product.image" :alt="product.name" height="50px" width="50px">
+                <div class="order-box" v-for="(product, index) in cart" :key="index">
+                    <!-- {{product}} -->
+                    <img :src="'/products/'+product.image" :alt="product.name" height="50px" width="50px">
                     <h2 class="title" v-html="product.name"></h2>
                     <p class="small-text text-muted float-left">{{formatCurrency(product.price * product.quantity)}}</p>
                     <p class="small-text text-muted float-right">Available Units: {{product.units}}</p>
@@ -35,28 +36,31 @@ export default {
     data () {
         return { 
             isLoggedIn : null,
-            products : [],
-            product: {},
             totalPrice: 0,
-            quantity: 0,
+            cart: [],
+            product: {}
+        }
+    },
+    computed : {
+        products: function() {
+            return this.$store.state.cart
         }
     },
     beforeMount() {
         this.isLoggedIn = localStorage.getItem('vue-laravel-ecommerce.jwt') != null
         if ( this.$route.query.pid ) {
             axios.get(`/api/products/${this.pid}`).then(response => {
-                console.log(response.data)
-                this.product.id = response.data.id
-                this.product.name = response.data.name
-                this.product.units = response.data.units
-                this.product.image = response.data.image
-                this.product.price = response.data.price
+                this.product.id = response.data[0].id
+                this.product.name = response.data[0].name
+                this.product.units = response.data[0].units
+                this.product.image = response.data[0].product_image[0].image
+                this.product.price = response.data[0].price
                 this.product.quantity = 1
-                this.products.push(this.product);
-                this.product = []
+                this.cart.push(this.product);
+                this.product = {}
             });
         } else {
-            this.products = JSON.parse(localStorage.getItem('vue-laravel-ecommerce.shopCart')); 
+            this.cart = this.$store.state.cart
         }
         if ( localStorage.getItem('vue-laravel-ecommerce.jwt' ) != null ) {
             this.user = JSON.parse(localStorage.getItem('vue-laravel-ecommerce.user'))
@@ -79,7 +83,7 @@ export default {
         placeOrder(e) {
             e.preventDefault();
             if ( this.$route.query.pid ) {
-                this.$router.push({ name: 'checkout', params: {nextUrl: this.$route.fullPath, pid: this.$route.query.pid, quantity: this.quantity }}).catch(() => {});
+                this.$router.push({ name: 'checkout', params: {nextUrl: this.$route.fullPath, pid: this.$route.query.pid, quantity: this.cart[0].quantity }}).catch(() => {});
             } else {
                 this.$router.push({ path: '/checkout', params: {nextUrl: this.$route.fullPath }}).catch(() => {});               
             }
@@ -94,7 +98,9 @@ export default {
         },
         checkUnits(product) {
             if ( !this.$route.query.pid ) {
-                this.$parent.$emit('changeQuantityCartItem', product)
+                this.$store.commit('changeQuantityItem', product)
+                this.$store.commit('totalItems');
+                this.$store.commit('totalPrice');    
             } else {
                 let findProduct = this.products.find(o => o.id === product.id)
                 if (findProduct) {
@@ -108,7 +114,7 @@ export default {
                 }    
             }
 
-            this.$forceUpdate();
+            //this.$forceUpdate();
         },
     }
 }

@@ -4,6 +4,8 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 //Imports
+import Vue from 'vue'
+import store from './store/store'
 require('./bootstrap');
 
 //Stylesheets
@@ -13,7 +15,6 @@ import 'primeicons/primeicons.css'
 import 'primeflex/primeflex.css'
 
 //PrimeVue
-import Vue from 'vue'
 import PrimeVue from 'primevue/config'
 import ConfirmationService from 'primevue/confirmationservice';
 import Toast from 'primevue/toast'
@@ -301,6 +302,7 @@ router.beforeEach((to, from, next) => {
 })
     const app = new Vue({
         el: '#app',
+        store,
         components: { App },
         router,
     });

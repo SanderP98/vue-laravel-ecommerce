@@ -45,7 +45,6 @@ export default {
             for (let field in event.formData) {
                 this.formObject[field] = event.formData[field];
             }
-            console.log(this.formObject)
             let name = this.formObject.shop.name
             let email = this.formObject.shop.email
             let tel_nr = this.formObject.shop.tel_nr
@@ -63,7 +62,7 @@ export default {
                     axios.post("/api/shop/", {name, email, image, tel_nr, mollie_api_key, paymentOptions});
 
                     this.$router.push({name: 'admin'}).catch(() => {});
-                    this.$forceUpdate()
+                    this.$parent.$parent.$emit('updateNav')
                 });
             }
 

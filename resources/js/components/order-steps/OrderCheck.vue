@@ -5,8 +5,8 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-8 offset-md-2">
-                    <div class="order-box" v-for="(product, index) in products" :key="index">
-                        <img :src="'/images/'+product.image" :alt="product.name" height="50px" width="50px">
+                    <div class="order-box" v-for="(product, index) in cart" :key="index">
+                        <img :src="'/products/'+product.image" :alt="product.name" height="50px" width="50px">
                         <h2 class="title" v-html="product.name"></h2>
                         <p class="small-text text-muted float-left">{{formatCurrency(product.price * product.quantity)}}</p>
                         <p class="small-text text-muted float-right">Available Units: {{product.units}}</p>
@@ -55,7 +55,12 @@ export default {
     props: ['pid', 'formData'],
     data () {
         return {
-            products: [],
+            cart: [],
+        }
+    },
+    computed : {
+        products() {
+            return this.$store.getters.products
         }
     },
     beforeMount() {
@@ -63,9 +68,9 @@ export default {
             this.$router.push({ path: '/' })
         }
         if ( Object.entries(this.$props.pid).length !== 0 ) {
-            this.products = this.$props.pid
+            this.cart = this.$props.pid
         } else {
-            this.products = JSON.parse(localStorage.getItem('vue-laravel-ecommerce.shopCart'));
+            this.cart = this.products
         }
     },
     methods : {

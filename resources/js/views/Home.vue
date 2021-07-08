@@ -17,7 +17,7 @@
             <template #list="slotProps">
                 <div class="p-col-12" v-if="slotProps.data.units !== 0">
                     <div class="product-list-item">
-                        <img :src="'/images/' + slotProps.data.product_image.image" :alt="slotProps.data.name"/>
+                        <img :src="'/products/' + slotProps.data.product_image[0].image" :alt="slotProps.data.name"/>
                         <div class="product-list-detail">
                             <div class="product-name">{{slotProps.data.name}}</div>
                             <div class="product-description">{{slotProps.data.description}}</div>
@@ -67,8 +67,8 @@
     export default {
         data() {
             return {
-                products : [],
                 product: {},
+                products: [],
                 isLoggedIn : null,
                 visibleLeft : false,
                 layout: 'grid',
@@ -98,8 +98,14 @@
 			    ],
             }
         },
+        // computed : {
+        //     products() {
+        //         return this.$store.state.products
+        //     },
+        // },
         mounted() {
             this.isLoggedIn = localStorage.getItem('vue-laravel-ecommerce.jwt') != null
+            // this.$store.dispatch("products");
             axios.get("api/products/").then(response => {
                 let products = response.data.products
                 products = products.map(product => {
@@ -135,7 +141,9 @@
             },
             addToCart(product) {
                 product.quantity = 1;
-                this.$parent.$emit('addToCart', product);
+                this.$store.commit('addToCart', product)
+                this.$store.commit('totalItems');
+                this.$store.commit('totalPrice');
             }
         },
     }
@@ -151,7 +159,6 @@
         padding: 2rem 0;
 
     }
-
     .product-image {
         width: 200px;
         height: 150px;
