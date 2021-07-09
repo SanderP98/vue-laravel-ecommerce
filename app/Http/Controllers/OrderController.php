@@ -57,8 +57,14 @@ class OrderController extends Controller
             //     $products = (object) $products;
             // }
             $totalPrice = number_format($request->get('totalPrice'), 2, '.', '');
+            Log::info($totalPrice);
+
             // Payment Methods can not be enabled when not being registered as a business, but it does work.
             $method = $request->get('paymentMethod');
+            Log::info($method);
+            Log::info($request->get('isSingleProduct'));
+            Log::info(Auth::id());
+
             $payment = Mollie::api()->payments()->create([
                 'amount' => [
                     'currency' => 'EUR', // Type of currency you want to send
@@ -113,7 +119,6 @@ class OrderController extends Controller
             return;
         }
         $payment = Mollie::api()->payments()->get($request->id);
-        
         //Log::info('Test '.$payment->metadata->order_id);
 
         $statusOfPayment='';
@@ -129,6 +134,7 @@ class OrderController extends Controller
             /*
              * The payment is open.
              */
+            Log::info($statusOfPayment);
              $statusOfPayment='open';
         } elseif ($payment->isPending()) {
             /*
@@ -167,10 +173,13 @@ class OrderController extends Controller
              */
               $statusOfPayment='partially charged back';
         }
+        Log::info($statusOfPayment);
+
+        $address = Address::where('user_id', $payment->metadata->user_id)->value('user_id');
 
         $order = Order::create([
             'user_id' => $payment->metadata->user_id,
-            'address_id' => 1, 
+            'address_id' => $address, 
             'order_status' => $statusOfPayment,
             'total_price' => $payment->metadata->totalPrice,
             'is_delivered' => 0,     
@@ -181,14 +190,12 @@ class OrderController extends Controller
         //     'totalPrice' => '8000',
         // ]);
         foreach($payment->metadata->products as $product) {
-            // Log::info($product->id);
             
             $order_details = $order->order_details()->create([
                 'product_id' => $product->id,
                 'quantity' => $product->quantity,
                 'total_price' => $product->price * $product->quantity,
             ]);
-
             $productUnits = Product::find($product->id);
 
             $productUnits->decrement('units', $product->quantity);

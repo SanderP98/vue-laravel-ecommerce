@@ -57,7 +57,7 @@
                 // products : [],
                 // product: {},
                 // totalPrice: 0,
-                singleProduct: false,
+                isSingular: false,
                 user: null,
                 items: [
                     {
@@ -96,27 +96,19 @@
         computed : {
             products: function() {
                 return this.$store.state.cart
+            },
+            singleProduct() {
+                return this.$store.state.singleOrder
             }
         },
         mounted() {
             this.isLoggedIn = localStorage.getItem('vue-laravel-ecommerce.jwt') != null
         },
         beforeMount() {
-            console.log(this.$route.params.pid);
-            console.log(this.$route.params.quantity);
             // console.log(this.pid)
             if ( this.$route.params.pid ) {
-                this.singleProduct = true;
-                axios.get(`/api/products/${this.pid}`).then(response => {
-                    this.product.id = response.data[0].id
-                    this.product.name = response.data[0].name
-                    this.product.units = response.data[0].units
-                    this.product.image = response.data[0].product_image[0].image
-                    this.product.price = response.data[0].price
-                    this.product.quantity = 1
-                    this.cart.push(this.product);
-                    this.product = {}
-                });
+                this.isSingular = true;
+                this.cart = this.$store.state.singleOrder
             } else {
                 this.cart = this.$store.state.cart
             }
@@ -195,7 +187,7 @@
                     return total + item.quantity * item.price;
                 }, 0);
                 let paymentMethod = this.formObject.paymentMethod
-                let isSingleProduct = this.singleProduct
+                let isSingleProduct = this.isSingular
                 axios.post('/api/molliepayment', { products, totalPrice, paymentMethod, isSingleProduct }).then(response => {
                     window.location.href = response.data.data._links.checkout.href;
                     // if (response.data.data.status == "paid") {
@@ -212,7 +204,7 @@
                     // })
 
                 }).catch(() => {});
-                this.singleProduct = false;
+                this.isSingular = false;
             },
             updateQuantityNonCartItem(product) {
                 let findProduct = this.products.find(o => o.id === product.id)

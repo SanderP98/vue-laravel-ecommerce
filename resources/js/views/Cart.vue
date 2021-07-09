@@ -43,21 +43,18 @@ export default {
     },
     computed : {
         products: function() {
-            return this.$store.state.cart
+            return this.$store.getters.cart
+        },
+        singleProduct() {
+            return this.$store.getters.singleOrder
         }
     },
     beforeMount() {
         this.isLoggedIn = localStorage.getItem('vue-laravel-ecommerce.jwt') != null
         if ( this.$route.query.pid ) {
             axios.get(`/api/products/${this.pid}`).then(response => {
-                this.product.id = response.data[0].id
-                this.product.name = response.data[0].name
-                this.product.units = response.data[0].units
-                this.product.image = response.data[0].product_image[0].image
-                this.product.price = response.data[0].price
-                this.product.quantity = 1
-                this.cart.push(this.product);
-                this.product = {}
+                this.$store.commit('singleOrder', response.data)
+                this.cart = this.$store.state.singleOrder
             });
         } else {
             this.cart = this.$store.state.cart
@@ -102,16 +99,7 @@ export default {
                 this.$store.commit('totalItems');
                 this.$store.commit('totalPrice');    
             } else {
-                let findProduct = this.products.find(o => o.id === product.id)
-                if (findProduct) {
-                    if ( product.quantity > product.units ) {
-                        product.quantity = product.units
-                    } else {
-                        findProduct.quantity = product.quantity;
-                    }
-                    findProduct.subtotal = product.quantity * findProduct.price;
-                    this.quantity = findProduct.quantity
-                }    
+                this.$store.commit('changeQuantitySingleOrder', product)
             }
 
             //this.$forceUpdate();

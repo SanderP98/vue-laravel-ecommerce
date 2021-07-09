@@ -8,6 +8,7 @@ export default new Vuex.Store({
         products: [],
         error: null,
         cart: JSON.parse(localStorage.getItem('cart')) ? JSON.parse(localStorage.getItem('cart')) : [],
+        singleOrder: JSON.parse(localStorage.getItem('singleOrder')) ? JSON.parse(localStorage.getItem('singleOrder')) : [], 
         totalItems: 0,
         totalPrice: 0,
         newCartItem: {}
@@ -41,6 +42,22 @@ export default new Vuex.Store({
             }
             localStorage.setItem('cart', JSON.stringify(state.cart));
         },
+        singleOrder ( state, product ) {
+            localStorage.removeItem('singleOrder');
+            state.singleOrder = []
+
+            state.newCartItem.id = product[0].id
+            state.newCartItem.name = product[0].name;
+            state.newCartItem.price = product[0].price;
+            state.newCartItem.quantity = 1;
+            state.newCartItem.image = product[0].product_image[0].image;
+            state.newCartItem.subtotal = product[0].price;
+            state.newCartItem.units = product[0].units;
+            state.singleOrder.push(Object.assign({},state.newCartItem))
+            state.newCartItem = {}       
+            
+            localStorage.setItem('singleOrder', JSON.stringify(state.singleOrder));
+        },
         totalItems ( state ) {
             state.totalItems = parseInt(state.cart.reduce((total, item) => {
                 return total + item.quantity;
@@ -60,16 +77,37 @@ export default new Vuex.Store({
         },
         changeQuantityItem ( state, product ) {
             let findProduct = state.cart.find(o => o.id === product.id)
-            if (findProduct) {
+            if ( findProduct ) {
                 if ( product.quantity > product.units ) {
                     product.quantity = product.units
                     state.error = "You are trying to exceed the product's available stock."
                 } else {
-                    findProduct.quantity = product.quantity;
+                    findProduct.quantity = parseInt(product.quantity);
                 }
                 findProduct.subtotal = product.quantity * findProduct.price;
             } 
             localStorage.setItem('cart', JSON.stringify(state.cart));
+        },
+        changeQuantitySingleOrder ( state, product ) {
+            let findProduct = state.singleOrder.find(o => o.id === product.id)
+            if ( findProduct ) {
+                if ( product.quantity > product.units ) {
+                    product.quantity = product.units
+                    state.error = "You are trying to exceed the product's available stock."
+                } else {
+                    findProduct.quantity = parseInt(product.quantity);
+                }
+                findProduct.subtotal = product.quantity * findProduct.price;
+            } 
+            localStorage.setItem('singleOrder', JSON.stringify(state.singleOrder));           
+        },
+        clearCart ( state ) {
+            localStorage.removeItem('cart');
+            state.cart = []           
+        },
+        clearSingleOrder () {
+            localStorage.removeItem('singleOrder');
+            state.singleOrder = []  
         },
         clearError ( state ) {
             state.error = null
@@ -77,6 +115,7 @@ export default new Vuex.Store({
     },
     getters: {
         cart: state => state.cart,
+        singleOrder: state => state.singleOrder,
         error: state => state.error,
         totalItems: state => state.totalItems,
         totalPrice: state => state.totalPrice

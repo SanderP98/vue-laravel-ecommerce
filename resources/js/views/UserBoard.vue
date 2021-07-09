@@ -34,11 +34,16 @@
             Main, Orders, Order
         },
         beforeMount() {
+            localStorage.getItem('vue-laravel-ecommerce.jwt')
+            localStorage.getItem('vue-laravel-ecommerce.user')
             this.$on('setComponent', this.setComponent)
             if ( this.$route.query.clear_cart ) {
+                this.$store.commit('clearCart');
+                this.$store.commit('totalItems');
+                this.$store.commit('totalPrice');
+                this.$parent.$emit('emptyCart')
                 this.activeComponent = Main;   
                 this.setComponent(this.$route.params.page)
-                this.$parent.$emit('emptyCart')
             }
             else if(this.$route.params.id) {
                 this.activeComponent = Order;
