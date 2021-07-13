@@ -105,10 +105,6 @@ export default new Vuex.Store({
             localStorage.removeItem('cart');
             state.cart = []           
         },
-        clearSingleOrder () {
-            localStorage.removeItem('singleOrder');
-            state.singleOrder = []  
-        },
         clearError ( state ) {
             state.error = null
         }
