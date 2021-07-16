@@ -178,8 +178,8 @@
     </nav>
     <div class="middleBar">
       <div class="container">
-        <div class="row display-table">
-          <div class="col-sm-3 vertical-align text-left d-none d-md-block">
+        <div class="row display-table m-0">
+          <div class="col-sm-3 col-md-1 col-lg-3 vertical-align text-left d-none d-md-block p-0">
             <a href="javascript:void(0);">
               <img
                 width=""
@@ -188,11 +188,11 @@
                 style="max-height:50px"
             /></a>
           </div>
-          <div class="col-sm-2"></div>
-          <div class="col-sm-7 vertical-align text-center">
+          <div class="col-sm-2 d-sm-none d-md-none d-lg-block"></div>
+          <div class="col-sm-12 col-md-11 col-lg-7 vertical-align text-center">
             <form>
-              <div class="row grid-space-1">
-                <div class="col-sm-6 p-0">
+              <div class="row grid-space-1 m-0">
+                <div class="col-sm-12 col-md-5 p-0">
                   <AutoComplete
                     v-model="selectedProduct"
                     :suggestions="filteredProducts"
@@ -201,7 +201,7 @@
                     field="name"
                   />
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-12 col-md-4 col-lg-5 col-xl-4">
                   <Dropdown
                     v-model="selectedCategory"
                     :options="categories"
@@ -209,8 +209,8 @@
                     placeholder="Select a Category"
                   />
                 </div>
-                <div class="col-sm-3">
-                  <Button label="Search" />
+                <div class="col-sm-12 col-md-2 col-xl-3 p-0">
+                  <Button class="btn-block btn-lg" label="Search" />
                 </div>
               </div>
             </form>
@@ -510,10 +510,13 @@ sup {
     background-color: #135ba1;
 }
 @media (max-width: 768px) {
-    .p-overlaypanel {
-        margin: 5px!important;
-        width:auto!important;
-    }
+  .middleBar .col-md-2 {
+    padding: 0px 15px!important;
+  }
+  .p-overlaypanel {
+      margin: 5px!important;
+      width:auto!important;
+  }
 	.dropdown-toggle>i {
 		margin-right: 0!important;
 	}
