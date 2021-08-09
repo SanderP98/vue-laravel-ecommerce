@@ -26,10 +26,12 @@
               ></span>
             </a>
             <ul class="dropdown-menu w-150" role="menu">
-              <li><a href="login.html">Login</a></li>
-              <li><a href="register.html">Create Account</a></li>
+              <li v-if="!isLoggedIn"><a href="login.html">Login</a></li>
+              <li v-if="!isLoggedIn"><a href="register.html">Create Account</a></li>
               <li class="divider"></li>
-              <li><a href="wishlist.html">Wishlist (5)</a></li>
+              <!-- <li><a href="wishlist.html">Wishlist (5)</a></li> -->
+              <li><a href="settings.html">Profile settings</a></li>
+              <li><a href="orders.html">My Orders</a></li>
               <li><a href="cart.html">My Cart</a></li>
               <li><a href="checkout.html">Checkout</a></li>
             </ul>
@@ -191,7 +193,7 @@
           <div class="col-sm-2 d-sm-none d-md-none d-lg-block"></div>
           <div class="col-sm-12 col-md-11 col-lg-7 vertical-align text-center">
             <form>
-              <div class="row grid-space-1 m-0">
+              <div class="row grid-space-1 m-0 search-block">
                 <div class="col-sm-12 col-md-5 p-0">
                   <AutoComplete
                     v-model="selectedProduct"
@@ -220,10 +222,10 @@
     </div>
     <nav class="bottomBar navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarScroll">
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="nav navbar-nav">
                 <li class=""><a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="false">Home</a></li>
                 <li class="dropdown megaDropMenu">
@@ -410,6 +412,12 @@
 </script>
 
 <style lang="scss" scoped>
+::v-deep .p-scrollpanel-bar-x {
+  display:none;
+}
+::v-deep .p-scrollpanel-content {
+  padding:0px!important;
+}
 .cartItem {
   border: 1px solid #e9ecef;  
   border-width: 1px 0 1px 0;
@@ -426,9 +434,6 @@
 }
 sup {
 	font-family: "Nunito", sans-serif;
-}
-.p-button-raised {
-
 }
 .p-overlaypanel {
 	width: 550px;
@@ -509,13 +514,24 @@ sup {
 ::v-deep .custom .p-scrollpanel-bar:hover {
     background-color: #135ba1;
 }
+@media (min-width: 768px) {
+  .search-block * {
+    height:42px;
+  }
+}
 @media (max-width: 768px) {
+  ::v-deep .p-overlaypanel-close {
+    right: -0.3rem!important;
+  }
   .middleBar .col-md-2 {
     padding: 0px 15px!important;
   }
   .p-overlaypanel {
       margin: 5px!important;
-      width:auto!important;
+      width: -moz-calc(100% - 10px) !important;
+      width: -webkit-calc(100% - 10px) !important;
+      width: -o-calc(100% - 10px) !important;
+      width: calc(100% - 10px) !important;
   }
 	.dropdown-toggle>i {
 		margin-right: 0!important;
@@ -920,5 +936,4 @@ sup {
 		width: auto!important;
 	}
 }
-
 </style>

@@ -71,7 +71,7 @@ export default new Vuex.Store({
         removeFromCart ( state, product ) {
             let findProduct = state.cart.find(o => o.id === product.id)
             if ( findProduct ) {
-                state.cart.pop( this.findProduct );
+                state.cart = state.cart.filter( val => val.id !== findProduct.id );
             }  
             localStorage.setItem('cart', JSON.stringify(state.cart));
         },
