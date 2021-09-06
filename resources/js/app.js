@@ -51,6 +51,8 @@ import ScrollPanel from 'primevue/scrollpanel'
 import ProgressBar from 'primevue/progressbar'
 import Galleria from 'primevue/galleria'
 import AutoComplete from 'primevue/autocomplete'
+import Password from 'primevue/password'
+import Checkbox from 'primevue/checkbox'
 
 //Services
 Vue.use(PrimeVue)
@@ -90,6 +92,8 @@ Vue.use(ScrollPanel)
 Vue.use(ProgressBar)
 Vue.use(Galleria)
 Vue.use(AutoComplete)
+Vue.use(Password)
+Vue.use(Checkbox)
 
 Vue.component('Toast', Toast)
 Vue.component('MultiSelect', MultiSelect)
@@ -123,6 +127,8 @@ Vue.component('ScrollPanel', ScrollPanel)
 Vue.component('ProgressBar', ProgressBar)
 Vue.component('Galleria', Galleria)
 Vue.component('AutoComplete', AutoComplete)
+Vue.component('Password', Password)
+Vue.component('Checkbox', Checkbox)
 
 //Views
 import App from './views/App'

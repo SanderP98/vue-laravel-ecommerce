@@ -26500,3 +26500,31 @@ readers do not read off random characters that represent icons */
   font-family: "Font Awesome 5 Brands";
   font-weight: 400;
 }
+
+.fa-stack[data-count]:after {
+  position: absolute;
+  right: 0.7em;
+  margin-left: auto;
+  top: 0.3em;
+  content: attr(data-count);
+  font-size: 40%;
+  padding: 0.4em;
+  border-radius: 999px;
+  line-height: 0.75em;
+  color: #FFFFFF;
+  color: #495057;
+  text-align: center;
+  min-width: 2em;
+  font-weight: bold;
+  border: solid;
+  background: #FFFFFF;
+}
+
+.fa-circle {
+  color: #495057;
+}
+
+.red-cart {
+  color: #495057;
+  background: #FFFFFF;
+}

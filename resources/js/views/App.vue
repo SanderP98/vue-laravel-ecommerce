@@ -5,7 +5,6 @@
         <ul class="list-inline float-left d-none d-md-inline-flex">
           <li>
             <span class="text-primary">Have a question? </span>{{shopInfo.tel_nr}}
-            
           </li>
         </ul>
         <ul class="topBarNav float-right">
@@ -26,14 +25,15 @@
               ></span>
             </a>
             <ul class="dropdown-menu w-150" role="menu">
-              <li v-if="!isLoggedIn"><a href="login.html">Login</a></li>
-              <li v-if="!isLoggedIn"><a href="register.html">Create Account</a></li>
+              <li v-if="!isLoggedIn"><router-link :to="{ name: 'login' }" class="nav-link" v-if="!isLoggedIn">Login</router-link></li>
+              <li v-if="!isLoggedIn"><router-link :to="{ name: 'register' }" class="nav-link" v-if="!isLoggedIn">Register</router-link></li>
               <li class="divider"></li>
               <!-- <li><a href="wishlist.html">Wishlist (5)</a></li> -->
               <li><a href="settings.html">Profile settings</a></li>
               <li><a href="orders.html">My Orders</a></li>
               <li><a href="cart.html">My Cart</a></li>
               <li><a href="checkout.html">Checkout</a></li>
+              <li v-if="isLoggedIn" @click="logout"><a href="">Logout</a></li>
             </ul>
           </li>
           <li class="dropdown">
@@ -220,14 +220,14 @@
         </div>
       </div>
     </div>
-    <nav class="bottomBar navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="bottomBar navbar navbar-expand-lg navbar-light bg-light mb-3">
         <div class="container">
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="nav navbar-nav">
-                <li class=""><a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="false">Home</a></li>
+                <li class=""><router-link :to="{ name: 'home' }">Home</router-link></li>
                 <li class="dropdown megaDropMenu">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="false">Shop <i class="fa fa-angle-down ml-5"></i></a>
                   <ul class="dropdown-menu row">
