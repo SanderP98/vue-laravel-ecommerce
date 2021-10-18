@@ -28,7 +28,7 @@
                                     </div>
                                     <Divider />
                                     <span class="small-text">Available Quantity: {{product.units}}</span>
-                                    <div class="p-d-flex">
+                                    <div class="p-d-flex p-mt-3">
                                         <router-link :to="{ path: '/cart?pid='+product.id }" class="p-button p-mr-1">Buy Now</router-link>
                                         <Button icon="pi pi-shopping-cart" :disabled="product.units === '0'" @click="addToCart(product)"></Button>
                                     </div>
@@ -226,7 +226,6 @@
                     axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('vue-laravel-ecommerce.jwt')
                     axios.post(`/api/add-review/`, { product, user, rating, title, description }).then(response => {
                     this.$toast.add({severity:'success', summary: 'Successful', detail: response.data.message, life: 3000});
-                    this.getReviews();
                     })
                     this.display = false
                 }
@@ -236,7 +235,7 @@
                 let url = `/api/products/${this.$route.params.id}`
                 axios.get(url).then(response => {
                     this.product = response.data
-                    let product_rating = this.product[0].product_rating
+                    let product_rating = this.product[0].product_rating.filter(item => item.is_approved === 1)
                     this.totalRatings = Object.keys(product_rating).length
                     let averageRating = product_rating.reduce((sum, { rating }) => sum + rating, 0) / product_rating.length
                     if ( averageRating ) {
@@ -248,11 +247,11 @@
                     if ( localStorage.getItem('vue-laravel-ecommerce.user') ) {
                         this.user = JSON.parse(localStorage.getItem('vue-laravel-ecommerce.user'))
                         let findReview = product_rating.find(o => o.user_id === this.user.id)
+                        console.log(findReview);
                         if ( findReview ) {
                             this.hasReview = true
                         }
                     }
-
                     this.ratingCounts.fiveStars.totalRatings = product_rating.filter(item => item.rating === 5).length
                     this.ratingCounts.fiveStars.averageOfTotal = Math.round((this.ratingCounts.fiveStars.totalRatings / this.totalRatings) * 100)
                     this.ratingCounts.fourStars.totalRatings = product_rating.filter(item => item.rating === 4).length

@@ -23,7 +23,9 @@
             </template>
 
             <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
-            <Column field="name" header="Name" sortable></Column>
+            <Column field="first_name" header="First Name" sortable></Column>
+            <Column field="last_name" header="Last Name" sortable></Column>
+            <Column field="phone_number" header="Phone Number" sortable></Column>
             <Column field="email" header="E-mail" sortable></Column>
             <Column field="is_admin" header="Role" sortable>
                 <template #body="slotProps">

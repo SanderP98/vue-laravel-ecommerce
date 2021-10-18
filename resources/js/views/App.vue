@@ -36,7 +36,7 @@
               <li v-if="isLoggedIn" @click="logout"><a href="">Logout</a></li>
             </ul>
           </li>
-          <li class="dropdown">
+          <li class="dropdown cart">
             <a href="#" class="dropdown-toggle" @click="showCart">
               <i class="fa fa-shopping-basket mr-5"
                 ><sup
@@ -457,7 +457,7 @@ sup {
 	border-bottom-color: #f8f9fa;
 } 
 
-::v-deep .p-datatable-thead {
+::v-deep .cart .p-datatable-thead {
 	display: none;
 }
 
