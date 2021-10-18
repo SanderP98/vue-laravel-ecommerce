@@ -10,6 +10,9 @@
         <div class="col-md-4 product-box d-flex align-content-center justify-content-center flex-wrap big-text">
             <a href='/admin/users' v-if="!isLoading">Users ({{users.length}})</a><ProgressSpinner v-if="isLoading" style="width:50px;height:50px" strokeWidth="8" fill="#EEEEEE" animationDuration=".5s"/>
         </div>
+        <div class="col-md-4 product-box d-flex align-content-center justify-content-center flex-wrap big-text">
+            <a href='/admin/reviews' v-if="!isLoading">Reviews ({{reviews.length}})</a><ProgressSpinner v-if="isLoading" style="width:50px;height:50px" strokeWidth="8" fill="#EEEEEE" animationDuration=".5s"/>
+        </div>
     </div>
 </template>
 
@@ -21,6 +24,7 @@
                 orders : [],
                 products : [],
                 users : [],
+                reviews : [],
                 isLoading : true,
             }
         },
@@ -33,6 +37,9 @@
             });
             axios.get('/api/orders/').then(response => {
                 this.orders = response.data
+            });
+            axios.get('/api/reviews/').then(response => {
+                this.reviews = response.data
                 this.isLoading = false;
             });
         }

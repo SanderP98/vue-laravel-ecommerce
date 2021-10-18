@@ -26,7 +26,16 @@
                 </template>
 
                 <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
-                <Column field="user.name" header="User" sortable></Column>
+                <Column field="id" header="Order Number" sortable>
+                    <template #body="slotProps">
+                        {{ "#" + slotProps.data.id }}
+                    </template>
+                </Column>
+                <Column field="user" header="Name" sortable>
+                    <template #body="slotProps">
+                        {{ slotProps.data.user.first_name + " " + slotProps.data.user.last_name }}
+                    </template>                
+                </Column>
                 <!-- <Column header="Product(s)" sortable>
                     <template #body="slotProps">
                         <DataTable :value="slotProps.data.order_details">

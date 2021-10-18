@@ -12,6 +12,7 @@
                         <li><button v-if="configCompleted" class="btn" @click="setComponent('products')">Products</button></li>
                         <li><button v-if="configCompleted" class="btn" @click="setComponent('users')">Users</button></li>
                         <li><button v-if="!configCompleted" class="btn" @click="setComponent('setup')">Setup</button></li>
+                        <li><button v-if="configCompleted" class="btn" @click="setComponent('reviews')">Reviews</button></li>
                     </ul>
                 </div>
                 <div class="col-lg-8">
@@ -28,6 +29,7 @@
     import Products from '../components/admin/Products'
     import Orders from '../components/admin/Orders'
     import Setup from '../components/admin/Setup'
+    import Reviews from '../components/admin/Reviews'
     export default {
         data () {
             return {
@@ -68,6 +70,10 @@
                     case "setup":
                         this.activeComponent = Setup
                         this.$router.push({ name: 'shop-wizard', params: {page: 'setup' }}).catch(() => {});
+                        break;
+                    case "reviews":
+                        this.activeComponent = Reviews
+                        this.$router.push({ name: 'admin-pages', params: {page: 'reviews' }}).catch(() => {});
                         break;
                     default: 
                         this.activeComponent = Main

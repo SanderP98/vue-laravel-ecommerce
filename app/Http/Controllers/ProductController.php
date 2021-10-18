@@ -27,6 +27,15 @@ class ProductController extends Controller
         ]);
     }
 
+    public function showApprovableReviews() {
+        $ratings = ProductRating::with('product', 'product_image', 'user')->where('is_approved', '0')->get();
+        return response()->json($ratings, 200);
+    }
+    public function showApprovedReviews() {
+        $ratings = ProductRating::with('product', 'product_image', 'user')->where('is_approved', '1')->get();
+        return response()->json($ratings, 200);        
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -72,7 +81,10 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        $product = Product::with('product_rating', 'product_rating.user', 'product_image')->whereIn('id', $product)->get();
+        $product = Product::with(['product_image', 'product_rating.user',  'product_rating' => function($query) {
+            $query->where('product_ratings.is_approved', '=', 1);
+        }])->whereIn('id', $product)->get();
+        
         return response()->json($product, 200);
     }
 
@@ -92,6 +104,7 @@ class ProductController extends Controller
             'rating' => $request->rating,
             'title' => $request->title,
             'description' => $request->description,
+            'is_approved' => 0
         ]);
 
         return response()->json([
@@ -151,6 +164,13 @@ class ProductController extends Controller
         ]);
     }
 
+    public function approveReview($id) {
+        ProductRating::find($id)->update(['is_approved' => 1]);
+    }
+
+    public function refuseReview($id) {
+        ProductRating::find($id)->delete();
+    }
     /**
      * Remove the specified resource from storage.
      *
