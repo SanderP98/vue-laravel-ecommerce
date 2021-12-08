@@ -4,7 +4,7 @@
       <div class="container">
         <ul class="list-inline float-left d-none d-md-inline-flex">
           <li>
-            <span class="text-primary">Have a question? </span>{{shopInfo.tel_nr}}
+            <span class="text-primary">Have a question? </span><div v-if="shopInfo">{{shopInfo.tel_nr}}</div>
           </li>
         </ul>
         <ul class="topBarNav float-right">
@@ -181,7 +181,7 @@
     <div class="middleBar">
       <div class="container">
         <div class="row display-table m-0">
-          <div class="col-sm-3 col-md-1 col-lg-3 vertical-align text-left d-none d-md-block p-0">
+          <div v-if="shopInfo" class="col-sm-3 col-md-1 col-lg-3 vertical-align text-left d-none d-md-block p-0">
             <a href="javascript:void(0);">
               <img
                 width=""
