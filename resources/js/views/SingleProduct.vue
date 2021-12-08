@@ -89,11 +89,11 @@
                 </div>                
                 <div class="p-field">
                     <label for="title">Title</label><br/>
-                    <InputText id="title" style="with:100%!important;" v-model="review.title" type="text" required="true"/>
+                    <InputText id="title" style="with:100%!important;" v-model="review.title" type="text" required="true" onkeypress="return (event.charCode > 64 && event.charCode < 91) || (event.charCode > 96 && event.charCode < 123) || (event.charCode==32)"/>
                 </div>
                 <div class="p-field">
                     <label for="description">Description</label><br/>
-                    <TextArea id="description" v-model="review.description" required="true" rows="3" cols="20" maxlength="250"/>
+                    <TextArea id="description" v-model="review.description" required="true" rows="3" cols="20" maxlength="250" onkeypress="return (event.charCode > 64 && event.charCode < 91) || (event.charCode > 96 && event.charCode < 123) || (event.charCode==32)" />
                 </div>
                 <template #footer>
                     <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog"/>
@@ -214,10 +214,10 @@
                 if (!rating) {
                     this.errors.push("Rating required.");
                 }
-                if(!/[A-Za-z]+$/.test(title)) {
+                if(!/[A-Za-z]/.test(title)) {
                     this.errors.push('Title is empty or contains numeric values.');
                 } 
-                if (!description) {
+                if (/[A-Za-z]/.test(!description)) {
                     this.errors.push('Description required.')
                 }
 
