@@ -1,4 +1,4 @@
-![alt text](Laravel_Vue_E-commerce_App.png)
+![alt text](https://github.com/SanderP98/vue-laravel-ecommerce/tree/master/public/Laravel_Vue_E-commerce_App.png)
 
 <details>
   <summary>An e-commerce platform build with the help of Laravel and Vue.</summary>
