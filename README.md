@@ -53,7 +53,19 @@ Here is a list of the most important frameworks/libraries that I used to build t
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
+### Key Features
 
+- Functional shopping cart: able to view the contents, delete a cart item or change the quantity of the cart items.
+
+- Mollie Integration: able to order a product with a webhook and also receive an e-mail with your order details. There is also a page to view your orders.
+
+- Review a product: able to leave a product review, every review needs to get approved by an administrator before it gets shown on the product's page. 
+
+- Search products: you can search for products and even filter them by category.
+
+- View products, orders, users and reviews: able to use CRUD functionality. 
+
+To visit the admin dashboard, navigate to: /admin, if you are logged in as a normal user you can use /dashboard.
 
 <!-- GETTING STARTED -->
 ## Getting Started
