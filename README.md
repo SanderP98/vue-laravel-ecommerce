@@ -1,3 +1,4 @@
+![alt text](Laravel_Vue_E-commerce_App.png)
 
 <details>
   <summary>An e-commerce platform build with the help of Laravel and Vue.</summary>
