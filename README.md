@@ -1,62 +1,144 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+<details>
+  <summary>An e-commerce platform build with the help of Laravel and Vue.</summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">About The Project</a>
+      <ul>
+        <li><a href="#built-with">Built With</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#installation">Installation</a></li>
+      </ul>
+    </li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#acknowledgments">Acknowledgments</a></li>
+  </ol>
+</details>
 
-## About Laravel
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+<!-- ABOUT THE PROJECT -->
+## About The Project
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+There weren't really that many great examples of e-commerce applications being build using the combination of the two (Laravel and Vue) and thus I decided to give it a try myself. I could only find one great tutorial on the web in particular, which covered the fundamentals. I decided to expand that application after reading the tutorial because I saw a lot of potential.
 
-## Learning Laravel
+I don't necessarily think it's bad to work with someone else's code, as long as you can understand it, learn to cope with the frameworks and develop new features on your own. And so I took on this challenge, soon after I realised that it was rather fun working on my own hobby project.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Never before did I use Vue JS, but a friend of mine inspired me to make use of it. I think that progressive front-end frameworks are really awesome, it gives a whole new meaning to front-end development. Over the past few months I have learned a lot from Vue JS and I am excited to keep on working on this project in my free-time!
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+<p align="right">(<a href="#top">back to top</a>)</p>
 
-## Laravel Sponsors
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
 
-### Premium Partners
+### Built With
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
+Here is a list of the most important frameworks/libraries that I used to build this application.
 
-## Contributing
+* [Vue.js](https://vuejs.org/)
+* [Vue-Loader](https://vue-loader.vuejs.org/)
+* [PrimeVue](https://www.primefaces.org/primevue/showcase-v2/)
+* [Vuex](https://vuex.vuejs.org/)
+* [Vue-Router](https://router.vuejs.org/)
+* [LocalTunnel](https://www.npmjs.com/package/localtunnel)
+* [Laravel](https://laravel.com)
+* [Bootstrap](https://getbootstrap.com)
+* [JQuery](https://jquery.com)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+<p align="right">(<a href="#top">back to top</a>)</p>
 
-## Code of Conduct
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
-## Security Vulnerabilities
+<!-- GETTING STARTED -->
+## Getting Started
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Let's try and run this "bad boy" on our own local computer shall we?
 
-## License
+### Prerequisites
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+To clone and run this application, it is important to have [Git](/https://git-scm.com/ "Git"), [Node.JS](https://nodejs.org/en/download/ "Node.JS") and [Composer](https://getcomposer.org/download/ "Composer") pre-installed.
+### Installation
+
+_Below are some instructions on how to get this application up and running on a local server._
+
+1. Create a new [Mollie account](https://www.mollie.com/ "Mollie account") 
+
+2. Head over to config/mollie.php and enter your test API key
+1. Clone the repository
+
+   ```sh
+   git clone https://github.com/SanderP98/vue-laravel-ecommerce.git
+   ```
+2. Start your SQL server and create a new database
+3. Rename the .env.example file to .env and change the database name properly
+
+4. Generate the application encryption key
+   ```sh
+	php artisan key:generate
+   ```
+5. Install NPM packages
+
+   ```sh
+   npm install
+   npm i vue-loader
+   ```
+6. Install Composer packages
+   ```sh
+   composer install
+   ```
+7. Migrate the database
+
+   ```sh
+   php artisan migrate
+   ```
+8. Install Laravel Passport
+
+   ```sh
+   php artisan passport:install
+   ```
+9. Change the credentials of the "UsersTableSeeder" and execute the seeder
+
+   ```sh
+   php artisan db:seed
+   ```
+10. Start the webserver, the hot reloader and the SSH tunnel for our webhook
+
+   ```sh
+   php artisan serve
+   lt -p 8000
+   npm run hot
+   ```
+
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+
+
+<!-- USAGE EXAMPLES -->
+## Usage
+
+Once everything is set up, you can visit your local server and click on the "My Account" dropdown menu in the topright corner. Now just log in with your given credentials and you should get redirected to the administrator dashboard. 
+
+From here you can click on the "setup" button in the sidebar, this will open the quick setup wizard for your web store. 
+
+_( Keep in mind that this is installation wizard is not completed yet. For example there is an input field for your Mollie API key, but it does nothing yet. )_
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+<!-- CONTACT -->
+## Contact
+
+Sander Plomp - [Twitter](https://twitter.com/SanderPlomp_) - [LinkedIn](https://www.linkedin.com/in/sander-p-4524ab129/) - sander.plomp@live.nl
+
+Project Link: [https://github.com/SanderP98/vue-laravel-ecommerce](https://github.com/SanderP98/vue-laravel-ecommerce)
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
