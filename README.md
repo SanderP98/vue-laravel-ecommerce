@@ -16,11 +16,8 @@
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
+    <li><a href="#honorable-mention">Honorable mention</a></li>
   </ol>
 </details>
 
@@ -142,3 +139,7 @@ Project Link: [https://github.com/SanderP98/vue-laravel-ecommerce](https://githu
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
+<!-- Honorable mention -->
+## Honorable mention
+
+Neo Ighodaro - [Build an e-commerce application using Laravel and Vue – Part 1: Application Setup](https://blog.pusher.com/ecommerce-laravel-vue-part-1/)
