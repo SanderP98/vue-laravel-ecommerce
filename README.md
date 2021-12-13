@@ -81,45 +81,45 @@ _Below are some instructions on how to get this application up and running on a 
 
 1. Create a new [Mollie account](https://www.mollie.com/ "Mollie account") 
 
-2. Head over to config/mollie.php and enter your test API key
-1. Clone the repository
+2. Clone the repository
 
    ```sh
    git clone https://github.com/SanderP98/vue-laravel-ecommerce.git
    ```
-2. Start your SQL server and create a new database
-3. Rename the .env.example file to .env and change the database name properly
+3. Head over to config/mollie.php and enter your test API key
+4. Start your SQL server and create a new database
+5. Rename the .env.example file to .env and change the database name properly
 
-4. Generate the application encryption key
+6. Generate the application encryption key
    ```sh
 	php artisan key:generate
    ```
-5. Install NPM packages
+7. Install NPM packages
 
    ```sh
    npm install
    npm i vue-loader
    ```
-6. Install Composer packages
+8. Install Composer packages
    ```sh
    composer install
    ```
-7. Migrate the database
+9. Migrate the database
 
    ```sh
    php artisan migrate
    ```
-8. Install Laravel Passport
+10. Install Laravel Passport
 
    ```sh
    php artisan passport:install
    ```
-9. Change the credentials of the "UsersTableSeeder" and execute the seeder
+11. Change the credentials of the "UsersTableSeeder" and execute the seeder
 
    ```sh
    php artisan db:seed
    ```
-10. Start the webserver, the hot reloader and the SSH tunnel for our webhook
+12. Start the webserver, the hot reloader and the SSH tunnel for our webhook
 
    ```sh
    php artisan serve
