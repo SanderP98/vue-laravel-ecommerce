@@ -4,7 +4,7 @@
       <div class="container">
         <ul class="list-inline float-left d-none d-md-inline-flex">
           <li>
-            <span class="text-primary">Have a question? </span><div v-if="shopInfo">{{shopInfo.tel_nr}}</div>
+            <span class="text-primary">Have a question? </span><div v-if="shopInfo" class="shopTel">{{shopInfo.tel_nr}}</div>
           </li>
         </ul>
         <ul class="topBarNav float-right">
@@ -201,7 +201,17 @@
                     placeholder="Search for a Product.."
                     @complete="searchProduct($event)"
                     field="name"
-                  />
+                  >
+                  <!--@clear="clearFilter($event)"-->
+                  	<template #item="slotProps">
+                        <router-link :to="{ path: '/products/'+slotProps.item.id }" @click="clearSearch">
+                          <a>
+                            <img :alt="slotProps.item.product_image[0].image" :src="'/products/' + slotProps.item.product_image[0].image" />
+                            <div>{{slotProps.item.name}}</div>
+                          </a>
+                        </router-link>
+                    </template>
+                  </AutoComplete>
                 </div>
                 <div class="col-sm-12 col-md-4 col-lg-5 col-xl-4">
                   <Dropdown
@@ -299,8 +309,6 @@
                 user_type : 0,
                 shopInfo: [],
                 cartItems: [],
-                products: [],
-                categories: [],
                 filteredProducts: null,
                 selectedProduct: null,
                 selectedCategory: null,
@@ -313,10 +321,17 @@
                     units: 0,
                 },
                 totalItemsString: '0',
-                isLoggedIn: localStorage.getItem('vue-laravel-ecommerce.jwt') != null
+                isLoggedIn: localStorage.getItem('vue-laravel-ecommerce.jwt') != null,
+                isLoaded: 0
             }
         },
         computed : {
+            products() {
+              return this.$store.state.products
+            },
+            categories() {
+                return this.$store.state.categories
+            },
             cart() {
                 return this.$store.state.cart
             },
@@ -334,19 +349,27 @@
                 return this.$store.state.error
             }
         },
+        created() {
+
+        },
         beforeMount() {
-            axios.get("api/products/").then(response => {
-                this.products = response.data.products
-                this.categories = response.data.categories
-            })
             axios.get('/api/shop').then( response => {
                 this.shopInfo = response.data[0] 
             })
-            this.$store.commit('totalItems');
-            this.$store.commit('totalPrice');
+            axios.get('/api/products/').then(response => {
+                console.log(response.data.products);
+                localStorage.setItem('products',  JSON.stringify(response.data.products))
+                localStorage.setItem('categories',  JSON.stringify(response.data.categories))
+                
+                this.$store.commit('totalItems');
+                this.$store.commit('totalPrice');
+                this.$store.commit('updateSearch');
+            })
+
+            this.isLoaded += 1
         },
         mounted() {
-            this.setDefaults()
+            this.setDefaults()  
             this.$on("updateNav", function() {
                 axios.get('/api/shop').then( response => {
                     this.shopInfo = response.data[0] 
@@ -371,7 +394,7 @@
             logout() {
                 localStorage.removeItem('vue-laravel-ecommerce.jwt')
                 localStorage.removeItem('vue-laravel-ecommerce.user')
-                localStorage.removeItem('vue-laravel-ecommerce.shopCart');
+                localStorage.removeItem('vue-laravel-ecommerce.shopCart');                
                 this.cartItems = [];
                 this.totalItems = "0";
                 this.totalPrice = 0;
@@ -412,6 +435,15 @@
 </script>
 
 <style lang="scss" scoped>
+::v-deep .p-rating .p-rating-icon.pi-star-fill, .p-rating:not(.p-disabled):not(.p-readonly) .p-rating-icon:hover  {
+    color: #F7BD17 !important;
+}
+::v-deep .pi-star::before {
+  content: "\e936";
+}
+::v-deep .pi-star-fill:before {
+  content: "\e937";
+}
 ::v-deep .p-scrollpanel-bar-x {
   display:none;
 }
@@ -675,6 +707,9 @@ sup {
 
 .text-primary {
 	color: #0cd4d2;
+}
+.topBar .shopTel {
+  display:inline;
 }
 .topBar i {
     font-size:13px;
