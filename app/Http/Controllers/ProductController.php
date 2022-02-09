@@ -25,10 +25,9 @@ class ProductController extends Controller
             'products' => Product::with('product_rating', 'product_category', 'product_image')->get(),
             'categories' => ProductCategory::all()
         ]);
+        Log::info(Product::with('product_rating', 'product_category', 'product_image')->get());
     }
-    public function showAllReviews() {
-        return response()->json(ProductRating::all(), 200);
-    }
+
     public function showApprovableReviews() {
         $ratings = ProductRating::with('product', 'product_image', 'user')->where('is_approved', '0')->get();
         return response()->json($ratings, 200);
@@ -36,6 +35,10 @@ class ProductController extends Controller
     public function showApprovedReviews() {
         $ratings = ProductRating::with('product', 'product_image', 'user')->where('is_approved', '1')->get();
         return response()->json($ratings, 200);        
+    }
+    public function showAllReviews() {
+        $ratings = ProductRating::with('product', 'product_image', 'user')->get();
+        return response()->json($ratings, 200);    
     }
 
     /**
@@ -112,6 +115,22 @@ class ProductController extends Controller
         return response()->json([
             'status' => $status,
             'message' => $status ? 'Review submitted!' : 'Review not submitted!'
+        ]); 
+    }
+    public function addProductCategory(Request $request) {
+
+        Log::info($request);
+
+        $status = ProductCategory::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            //Moet nog worden geïntegreerd, image support voor de categoriëen.
+            'image' => ''
+        ]);
+
+        return response()->json([
+            'status' => $status,
+            'message' => $status ? 'Product Category Added!' : 'Product Category has not been added!'
         ]); 
     }
     /**
