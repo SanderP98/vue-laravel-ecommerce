@@ -26,7 +26,9 @@ class ProductController extends Controller
             'categories' => ProductCategory::all()
         ]);
     }
-
+    public function showAllReviews() {
+        return response()->json(ProductRating::all(), 200);
+    }
     public function showApprovableReviews() {
         $ratings = ProductRating::with('product', 'product_image', 'user')->where('is_approved', '0')->get();
         return response()->json($ratings, 200);
