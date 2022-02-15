@@ -2,21 +2,21 @@
     <div>
         <div>
             <Toolbar class="mb-4">
-                <template #left>
+                <template #start>
                     <Button label="Delete" icon="pi pi-trash" class="p-button-danger" @click="confirmDeleteSelected" :disabled="!selectedOrders || !selectedOrders.length" />
                 </template>
 
-                <template #right>
+                <template #end>
                     <Button label="Export" icon="pi pi-upload" class="p-button-help" @click="exportCSV($event)" />
                 </template>
             </Toolbar>
 
             <DataTable ref="dt" :value="orders" :selection.sync="selectedOrders" dataKey="id"
             :paginator="true" :rows="10" :filters="filters"
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products">
+        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" responsiveLayout="scroll">
                 <template #header>
-                    <div class="table-header">
+                    <div class="table-header p-d-flex p-flex-column p-flex-md-row p-jc-md-between">
                         <h5 class="p-m-0">Manage orders</h5>
                         <span class="p-input-icon-left">
                             <i class="pi pi-search"/>

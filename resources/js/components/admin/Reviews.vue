@@ -153,7 +153,6 @@
 </template>
 
 <script>
-
 export default {
     data() {
         return {
@@ -204,7 +203,6 @@ export default {
         },
         refuseReview() {
             this.loading = true;
-
             axios.delete(`/api/refuseReview/${this.review.id}`)
             .then(response => {
                 axios.get('/api/approvableReviews/').then(response => {
@@ -214,7 +212,6 @@ export default {
                     this.approvedReviews = response.data
                     this.loading = false;
                 });
-
                 this.reviewDialog = false;
             });           
         }

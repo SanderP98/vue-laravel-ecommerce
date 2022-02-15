@@ -2,7 +2,7 @@
 <div>
     <div>
         <Toolbar class="mb-4">
-            <template #left>
+            <template #start>
                 <Button label="New" icon="pi pi-plus" class="p-button-success mr-2" @click="addUser" />
                 <Button label="Delete" icon="pi pi-trash" class="p-button-danger" @click="confirmDeleteSelected" :disabled="!selectedUsers || !selectedUsers.length" />
             </template>
@@ -11,9 +11,9 @@
         <DataTable ref="dt" :value="users" :selection.sync="selectedUsers" dataKey="id"
         :paginator="true" :rows="10" :filters="filters"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPage RowsPerPageDropdown" :rowsPerPageOptions="[5, 10, 25]"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users">
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users" responsiveLayout="scroll">
             <template #header>
-                <div class="table-header">
+                <div class="table-header p-d-flex p-flex-column p-flex-md-row p-jc-md-between">
                     <h5 class="p-m-0">Manage users</h5>
                     <span class="p-input-icon-left">
                         <i class="pi pi-search"></i>
@@ -23,17 +23,17 @@
             </template>
 
             <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
-            <Column field="first_name" header="First Name" sortable></Column>
-            <Column field="last_name" header="Last Name" sortable></Column>
-            <Column field="phone_number" header="Phone Number" sortable></Column>
-            <Column field="email" header="E-mail" sortable></Column>
-            <Column field="is_admin" header="Role" sortable>
+            <Column field="first_name" header="First Name" :sortable="true"></Column>
+            <Column field="last_name" header="Last Name" :sortable="true"></Column>
+            <Column field="phone_number" header="Phone Number" :sortable="true"></Column>
+            <Column field="email" header="E-mail" :sortable="true"></Column>
+            <Column field="is_admin" header="Role" :sortable="true">
                 <template #body="slotProps">
                     <div v-if="slotProps.data.is_admin == 1">Admin</div>
                     <div v-else>User</div>
                 </template>
             </Column>
-            <Column field="created_at" header="Creation Date" sortable></Column>
+            <Column field="created_at" header="Creation Date" :sortable="true"></Column>
         </DataTable>
     </div>
 </div>

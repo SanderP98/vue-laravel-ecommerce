@@ -1,19 +1,14 @@
 <template>
 <div>
-        <!--
-        <div class="col-lg-12 mb-5">
-            <MultiSelect v-model="selectedProducts" :options="products" optionLabel="name" optionValue="id" placeholder="Select Brands" />
-            <Button @click="Sander">Klik</Button>
-        </div>
-        --->
         <div>
             <Toolbar class="mb-4">
-                <template #left>
+                <template #start>
                     <Button label="New" icon="pi pi-plus" class="p-button-success mr-2" @click="addProduct" />
                     <Button label="Delete" icon="pi pi-trash" class="p-button-danger" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" />
                 </template>
 
-                <template #right>
+                <template #end>
+                    <Button label="Add product category" icon="pi pi-plus" class="p-button-info mr-2" @click="addProductCategory($event)" />
                     <Button label="Export" icon="pi pi-upload" class="p-button-help" @click="exportCSV($event)" />
                 </template>
             </Toolbar>
@@ -21,9 +16,9 @@
             <DataTable ref="dt" :value="products" :selection.sync="selectedProducts" dataKey="id"
             :paginator="true" :rows="10" :filters="filters"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products">
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" responsiveLayout="scroll">
                 <template #header>
-                    <div class="table-header">
+                    <div class="table-header p-d-flex p-flex-column p-flex-md-row p-jc-md-between">
                         <h5 class="p-m-0">Manage products</h5>
                         <span class="p-input-icon-left">
                             <i class="pi pi-search"/>
@@ -32,19 +27,19 @@
                     </div>
                 </template>
                 <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
-                <Column field="name" header="Name" sortable></Column>
-                <Column field="description" header="Description" sortable></Column>
+                <Column field="name" header="Name" :sortable="true"></Column>
+                <Column field="description" header="Description" :sortable="true"></Column>
                 <Column header="Image">
                     <template #body="slotProps">
                         <img :src="'/products/' + slotProps.data.product_image[0].image" :alt="slotProps.data.product_image[0].name" class="product-image" />
                     </template>
                 </Column>
-                <Column field="price" header="Price" sortable>
+                <Column field="price" header="Price" :sortable="true">
                     <template #body="slotProps">
                         {{formatCurrency(slotProps.data.price)}}
                     </template>
                 </Column>
-                <Column field="units" header="Units" sortable>
+                <Column field="units" header="Units" :sortable="true">
                     <template #body="slotProps">
                         <span :class="'product-badge status-' + slotProps.data.units">{{slotProps.data.units}}</span>
                     </template>
@@ -57,6 +52,29 @@
                 </Column>
             </DataTable>
         </div>
+
+        <Dialog :visible.sync="productCategoryDialog" :style="{width: '450px'}" header="Add Product Category" :modal="true" class="p-fluid">
+            <p v-if="errors.length">
+                <b>Please correct the following error(s):</b>
+                <ul>
+                <li v-for="error in errors" :key="error">{{ error }}</li>
+                </ul>
+            </p>
+            <div class="p-field">
+                <label for="name">Name</label>
+                <InputText id="name" v-model.trim="category.name" required="true" autofocus :class="{'p-invalid': submitted && !category.name}" />
+                <small class="p-invalid" v-if="submitted && !category.name">Name is required</small>
+            </div>
+            <div class="p-field">
+                <label for="description">Description</label>
+                <TextArea id="description" v-model="category.description"/>
+            </div>
+
+            <template #footer>
+                <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog"/>
+                <Button label="Save" icon="pi pi-check" class="p-button-text" @click="saveCategory" />
+            </template>
+        </Dialog>
 
         <Dialog :visible.sync="productDialog" :style="{width: '450px'}" header="Product Details" :modal="true" class="p-fluid">
             <img :src="'/products/' + product.product_image[0].image" :alt="product.product_image[0].name" class="product-image mb-2" v-if="product.product_image" />
@@ -127,15 +145,18 @@
                 products: [],
                 categories: [],
                 productDialog: false,
+                productCategoryDialog: false,
                 deleteProductDialog: false,
                 deleteProductsDialog: false,
                 product: {},
+                category: {},
                 selectedProducts : null,
                 filters: {},
                 submitted: false,
                 attachment: null,
                 chooseLabelText: 'Select a file',
                 isSelecting: false,
+                errors: [],
             }
         },
         computed: {
@@ -156,8 +177,14 @@
                 this.submitted = false;
                 this.productDialog = true;
             },
+            addProductCategory() {
+                this.category = {};
+                this.submitted = false;
+                this.productCategoryDialog = true;
+            },
             hideDialog() {
                 this.productDialog = false;
+                this.productCategoryDialog = false;
                 this.submitted = false;
             },
             attachFile(event) {
@@ -224,6 +251,22 @@
                     this.product = {};
                     this.attachment = {};
                 }
+            },
+            saveCategory(newCategory) {
+                this.submitted = true;
+                let name = this.category.name;
+                let description = this.category.description;
+
+                if (this.errors.length === 0) {
+                    axios.post("/api/addProductCategory/", {name, description}).then(response => {
+                        this.productCategoryDialog = false;
+                        this.errors = {};
+                        this.category = {};
+                        this.$toast.add({severity:'success', summary: 'Success Message', detail: response.data.message, life: 3000});
+                    });
+                }
+
+                this.getProducts();
             },
             editProduct(product) {
                 this.chooseLabelText = product.image;
