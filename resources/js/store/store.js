@@ -5,7 +5,8 @@ Vue.use(Vuex)
  
 export default new Vuex.Store({
     state: {
-        products: [],
+        products: JSON.parse(localStorage.getItem('products')) ? JSON.parse(localStorage.getItem('products')) : [],
+        categories: JSON.parse(localStorage.getItem('categories')) ? JSON.parse(localStorage.getItem('categories')) : [],
         error: null,
         cart: JSON.parse(localStorage.getItem('cart')) ? JSON.parse(localStorage.getItem('cart')) : [],
         singleOrder: JSON.parse(localStorage.getItem('singleOrder')) ? JSON.parse(localStorage.getItem('singleOrder')) : [], 
@@ -16,9 +17,6 @@ export default new Vuex.Store({
     actions: {    
     },
     mutations: {
-        // getProducts(state, products) {
-        //     state.products = products
-        // },
         addToCart ( state, product ) {
             let findProduct = state.cart.find(o => o.id === product.id)
             if( findProduct ) {
@@ -107,6 +105,10 @@ export default new Vuex.Store({
         },
         clearError ( state ) {
             state.error = null
+        },
+        updateSearch ( state ) {
+            state.products = JSON.parse(localStorage.getItem('products')) ? JSON.parse(localStorage.getItem('products')) : [],
+            state.categories = JSON.parse(localStorage.getItem('categories')) ? JSON.parse(localStorage.getItem('categories')) : []
         }
     },
     getters: {
@@ -114,6 +116,8 @@ export default new Vuex.Store({
         singleOrder: state => state.singleOrder,
         error: state => state.error,
         totalItems: state => state.totalItems,
-        totalPrice: state => state.totalPrice
+        totalPrice: state => state.totalPrice,
+        products: state => state.products,
+        categories: state => state.categories
     },
 })
