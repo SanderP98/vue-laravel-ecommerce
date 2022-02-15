@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <div class="row">
+        <div class="row">   
             <div class="col-md-12">
                 <div v-for="(product, index) in product" :key="index">
                     <!--{{product.product_image}}-->
@@ -179,15 +179,18 @@
         },
         beforeMount() {
             this.getReviews();
+            this.user = JSON.parse(localStorage.getItem('vue-laravel-ecommerce. d fuser'))
+            axios.defaults.headers.common['Content-Type'] = 'application/json'
+            axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('vue-laravel-ecommerce.jwt')
         },
-        watch: {
-            display: function(val) {
-                //do something when the data changes.
-                if (val == false) {
-                    this.review = {}
-                }
-            }
-        },
+        // watch: {
+        //     display: function(val) {
+        //         //do something when the data changes.
+        //         if (val == false) {
+        //             this.review = {}
+        //         }
+        //     }
+        // },
         methods : {
             formatCurrency(value) {
                  return value.toLocaleString('nl-NL', {style: 'currency', currency: 'EUR'});               
@@ -214,10 +217,10 @@
                 if (!rating) {
                     this.errors.push("Rating required.");
                 }
-                if(!/[A-Za-z]/.test(title)) {
+                if (!/[A-Za-z]/.test(title)) {
                     this.errors.push('Title is empty or contains numeric values.');
                 } 
-                if (/[A-Za-z]/.test(!description)) {
+                if (!/[A-Za-z]/.test(description)) {
                     this.errors.push('Description required.')
                 }
 
@@ -247,7 +250,6 @@
                     if ( localStorage.getItem('vue-laravel-ecommerce.user') ) {
                         this.user = JSON.parse(localStorage.getItem('vue-laravel-ecommerce.user'))
                         let findReview = product_rating.find(o => o.user_id === this.user.id)
-                        console.log(findReview);
                         if ( findReview ) {
                             this.hasReview = true
                         }
@@ -300,9 +302,6 @@
     }   
     ::v-deep .value-1 > .p-progressbar-value {
         background:#EE3A0F;
-    }
-    ::v-deep .p-rating .p-rating-icon.pi-star, .p-rating:not(.p-disabled):not(.p-readonly) .p-rating-icon:hover  {
-        color: #F7BD17 !important;
     }
     ::v-deep .p-inputtext {
         width:100%;
