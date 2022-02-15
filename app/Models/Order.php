@@ -13,7 +13,7 @@ class Order extends Model
     use HasFactory, SoftDeletes, Notifiable, HasEvents;
 
     protected $fillable = [
-        'user_id', 'address_id', 'total_price', 'order_status', 'is_delivered'
+        'user_id', 'address_id', 'total_price', 'order_status', 'is_delivered', 'payment_token'
     ];
 
     public function user() {

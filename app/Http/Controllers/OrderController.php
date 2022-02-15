@@ -52,18 +52,19 @@ class OrderController extends Controller
     {   
         if ( $request ) {
             $products = $request->get('products');
-            Log::info($products);
+            // Log::info('Hoevaak voert-ie dit uit?');
+            // Log::info($products);
             // if (!is_object($products)) {
             //     $products = (object) $products;
             // }
             $totalPrice = number_format($request->get('totalPrice'), 2, '.', '');
-            Log::info($totalPrice);
+            // Log::info($totalPrice);
 
             // Payment Methods can not be enabled when not being registered as a business, but it does work.
             $method = $request->get('paymentMethod');
-            Log::info($method);
-            Log::info($request->get('isSingleProduct'));
-            Log::info(Auth::id());
+            // Log::info($method);
+            // Log::info($request->get('isSingleProduct'));
+            // Log::info(Auth::id());
 
             $payment = Mollie::api()->payments()->create([
                 'amount' => [
@@ -106,7 +107,7 @@ class OrderController extends Controller
         //     return redirect()->to('/dashboard/orders?success=1');
         // }
         // return response()->json(['data' => 'test']);
-        Log::info($id);
+        Log::info("id is".$id);
         if ( $id == 0 ) {
             return redirect()->to('/dashboard/orders?clear_cart=1');
         } else {
@@ -118,8 +119,9 @@ class OrderController extends Controller
         if (! $request->has('id')) {
             return;
         }
+        // Log::info($request->input('id'));
         $payment = Mollie::api()->payments()->get($request->id);
-        //Log::info('Test '.$payment->metadata->order_id);
+        // Log::info('Order geplaatst');
 
         $statusOfPayment='';
 
@@ -173,37 +175,42 @@ class OrderController extends Controller
              */
               $statusOfPayment='partially charged back';
         }
-        Log::info($statusOfPayment);
+        // Log::info($statusOfPayment);
 
         $address = Address::where('user_id', $payment->metadata->user_id)->value('user_id');
 
-        $order = Order::create([
-            'user_id' => $payment->metadata->user_id,
-            'address_id' => $address, 
-            'order_status' => $statusOfPayment,
-            'total_price' => $payment->metadata->totalPrice,
-            'is_delivered' => 0,     
-        ]);
+        //check if order does not exist already
+        if (!Order::where('payment_token', '=', $request->input('id'))->exists()) {
+            $order = Order::create([
+                'user_id' => $payment->metadata->user_id,
+                'address_id' => $address, 
+                'order_status' => $statusOfPayment,
+                'total_price' => $payment->metadata->totalPrice,
+                'is_delivered' => 0,    
+                'payment_token' => $request->input('id') 
+            ]);
+
+            foreach($payment->metadata->products as $product) {
+            
+                $order_details = $order->order_details()->create([
+                    'product_id' => $product->id,
+                    'quantity' => $product->quantity,
+                    'total_price' => $product->price * $product->quantity,
+                ]);
+                $productUnits = Product::find($product->id);
+    
+                $productUnits->decrement('units', $product->quantity);
+    
+                $productUnits->save();
+                
+            }
+            // Mail::to($payment->metadata->user->email)->send(new OrderCreatedMail($order));
+        }
         // Log::info($payment->metadata->products);
         // $order_details = $order->order_details()->create([
         //     'quantity' => '1',
         //     'totalPrice' => '8000',
         // ]);
-        foreach($payment->metadata->products as $product) {
-            
-            $order_details = $order->order_details()->create([
-                'product_id' => $product->id,
-                'quantity' => $product->quantity,
-                'total_price' => $product->price * $product->quantity,
-            ]);
-            $productUnits = Product::find($product->id);
-
-            $productUnits->decrement('units', $product->quantity);
-
-            $productUnits->save();
-            
-        }
-        Mail::to($payment->metadata->user->email)->send(new OrderCreatedMail($order));
     }
 
     /**
