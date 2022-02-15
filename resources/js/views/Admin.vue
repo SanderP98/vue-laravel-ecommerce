@@ -11,7 +11,7 @@
                         <li><button v-if="configCompleted" class="btn" @click="setComponent('orders')">Orders</button></li>
                         <li><button v-if="configCompleted" class="btn" @click="setComponent('products')">Products</button></li>
                         <li><button v-if="configCompleted" class="btn" @click="setComponent('users')">Users</button></li>
-                        <li><button v-if="!configCompleted" class="btn" @click="setComponent('setup')">Setup</button></li>
+                        <li><button v-show="!configCompleted" class="btn" @click="setComponent('setup')">Setup</button></li>
                         <li><button v-if="configCompleted" class="btn" @click="setComponent('reviews')">Reviews</button></li>
                     </ul>
                 </div>
@@ -35,7 +35,7 @@
             return {
                 user: null,
                 activeComponent: null,
-                configCompleted: false,
+                configCompleted: true,
             }
         },
         components: {
@@ -47,7 +47,7 @@
             axios.defaults.headers.common['Content-Type'] = 'application/json'
             axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('vue-laravel-ecommerce.jwt')
             axios.get('/api/shop').then( response => {
-                if ( response.data.length ) {
+                if ( !response.data.length ) {
                     this.configCompleted = true
                 }
             });
