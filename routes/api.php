@@ -30,7 +30,6 @@ Route::get('payment-methods/{bool}',[OrderController::class, 'getPaymentMethods'
 Route::get('payment-success/{is_singular}',[OrderController::class, 'paymentSuccess'])->name('payment.success');
 Route::get('/approvableReviews', [ProductController::class, 'showApprovableReviews']);
 Route::get('/approvedReviews', [ProductController::class, 'showApprovedReviews']);
-Route::get('/reviews', [ProductController::class, 'showAllReviews']);
 
 Route::group(['middleware' => 'auth:api'], function(){
     Route::post('/upload-file', [ProductController::class, 'uploadFile']);
@@ -43,7 +42,6 @@ Route::group(['middleware' => 'auth:api'], function(){
     Route::get('users/{user}/address',[UserController::class, 'showAddress']);
     Route::patch('products/{product}/units/add',[ProductController::class, 'updateUnits']);
     Route::patch('orders/{order}/deliver',[OrderController::class, 'deliverOrder']);
-    Route::post('/addProductCategory', [ProductController::class, 'addProductCategory']);
     Route::patch('approveReview/{reviewId}', [ProductController::class, 'approveReview']);
     Route::delete('refuseReview/{reviewId}', [ProductController::class, 'refuseReview']);
     Route::delete('orders/{ids}/deleteMany', [OrderController::class, 'destroyMany']);
